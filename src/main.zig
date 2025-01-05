@@ -6,9 +6,9 @@ fn range(len: usize) []i32 {
     return @as([*]i32, undefined)[0..len];
 }
 
-const screenWidth = 1280;
-const screenHeight = 720;
-const fontSize = 36;
+const screenWidth = 1920;
+const screenHeight = 1080;
+const fontSize = 64;
 pub fn main() anyerror!void {
     rl.initWindow(screenWidth, screenHeight, "game2");
     defer rl.closeWindow(); // Close window and OpenGL context
@@ -35,12 +35,12 @@ pub fn main() anyerror!void {
             rl.clearBackground(rl.Color.white);
 
             rl.drawText("Feelz", 190, 200, 20, rl.Color.light_gray);
-            if (rg.guiButton(rl.Rectangle.init(10, 10, 128, 48), "Sentir") > 0) {
+            if (rg.guiButton(rl.Rectangle.init(10, 10, 256, 64), "Sentir") > 0) {
                 showMessageBox = true;
             }
 
             if (showMessageBox) {
-                if (rg.guiMessageBox(rl.Rectangle.init(85, 70, 512, 256), "#191#Message Box", "Hi! This is a message!", "Nice;Cool") >= 0) {
+                if (rg.guiMessageBox(rl.Rectangle.init(screenWidth / 2, screenHeight / 2, 512, 256), "#191#Message Box", "Hi! This is a message!", "Nice;Cool") >= 0) {
                     showMessageBox = false;
                 }
             }
