@@ -20,6 +20,7 @@ pub fn build(b: *std.Build) !void {
 
         exe_lib.linkLibrary(raylib_artifact);
         exe_lib.root_module.addImport("raylib", raylib);
+        exe_lib.root_module.addImport("raygui", raygui);
 
         // Note that raylib itself is not actually added to the exe_lib output file, so it also needs to be linked with emscripten.
         const link_step = try rlz.emcc.linkWithEmscripten(b, &[_]*std.Build.Step.Compile{ exe_lib, raylib_artifact });
