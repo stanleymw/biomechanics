@@ -2,10 +2,6 @@ const rl = @import("raylib");
 const rg = @import("raygui");
 const std = @import("std");
 
-fn range(len: usize) []i32 {
-    return @as([*]i32, undefined)[0..len];
-}
-
 pub fn main() anyerror!void {
     const screenWidth = 1280;
     const screenHeight = 720;
@@ -15,15 +11,7 @@ pub fn main() anyerror!void {
 
     rl.setTargetFPS(240);
     rg.guiSetStyle(rg.GuiControl.default, rg.GuiDefaultProperty.text_size, 30);
-    const fontData = @embedFile("resources/font.otf");
-
-    const ascii = range(256);
-    rg.guiSetFont(rl.loadFontFromMemory(
-        ".otf",
-        fontData,
-        30,
-        ascii,
-    ));
+    rg.guiSetFont(rl.loadFont("resources/font.otf"));
 
     var showMessageBox = false;
 
