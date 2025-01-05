@@ -27,6 +27,8 @@ pub fn build(b: *std.Build) !void {
         //this lets your program access files like "resources/my-image.png":
         link_step.addArg("--embed-file");
         link_step.addArg("resources/");
+        link_step.addArg("--shell-file");
+        link_step.addArg("web/template.html");
 
         b.getInstallStep().dependOn(&link_step.step);
         const run_step = try rlz.emcc.emscriptenRunStep(b);
