@@ -27,8 +27,8 @@ pub fn main() anyerror!void {
         fontSize,
         null,
     );
-    const interFont = rl.loadFontEx(
-        "resources/inter.ttf",
+    const boldFont = rl.loadFontEx(
+        "resources/bold-font.otf",
         fontSize,
         null,
     );
@@ -48,7 +48,7 @@ pub fn main() anyerror!void {
 
             switch (currentScreen) {
                 .MainMenu => {
-                    rl.drawTextEx(interFont, "Game", rl.Vector2.init(190, 200), 100, 0, rl.Color.light_gray);
+                    rl.drawTextEx(boldFont, "Game", rl.Vector2.init(190, 200), 100, 0, rl.Color.light_gray);
                     if (rg.guiButton(rl.Rectangle.init(10, 10, 256, 64), "Play !!") > 0) {
                         currentScreen = .Globe;
                     }
