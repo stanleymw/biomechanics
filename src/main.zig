@@ -15,14 +15,14 @@ pub fn main() anyerror!void {
 
     rl.setTargetFPS(240);
     rg.guiSetStyle(rg.GuiControl.default, rg.GuiDefaultProperty.text_size, 30);
-    const feelz = @embedFile("resources/font.otf");
+    const fontData = @embedFile("resources/font.otf");
 
-    const lol = range(255);
+    const ascii = range(256);
     rg.guiSetFont(rl.loadFontFromMemory(
         ".otf",
-        feelz,
+        fontData,
         30,
-        lol,
+        ascii,
     ));
 
     var showMessageBox = false;
