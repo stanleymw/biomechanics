@@ -25,6 +25,7 @@ pub fn main() anyerror!void {
 
     rl.setTargetFPS(240);
     rg.guiSetStyle(rg.GuiControl.default, rg.GuiDefaultProperty.text_size, fonts.Size.Medium);
+
     rg.guiSetFont(mainFont);
 
     var currentScreen: Screen = .MainMenu;
@@ -42,6 +43,7 @@ pub fn main() anyerror!void {
             switch (currentScreen) {
                 .MainMenu => {
                     rl.drawTextEx(mainFont, "Game", rl.Vector2.init(190, 200), fonts.Size.Medium, 0, rl.Color.light_gray);
+
                     if (rg.guiButton(rl.Rectangle.init(10, 10, 256, 64), "Play !!") > 0) {
                         currentScreen = .Globe;
                     }
