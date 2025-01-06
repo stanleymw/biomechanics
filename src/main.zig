@@ -19,11 +19,13 @@ pub fn main() anyerror!void {
     rl.initWindow(screenWidth, screenHeight, "game2");
     defer rl.closeWindow(); // Close window and OpenGL context
 
+    const mainFont = fonts.loadFont(fonts.Family.ComputerModern, fonts.Size.Medium);
+
     rl.drawFPS(0, 0);
 
     rl.setTargetFPS(240);
-    rg.guiSetStyle(rg.GuiControl.default, rg.GuiDefaultProperty.text_size, fonts.Sizes.Large);
-    rg.guiSetFont(fonts.ComputerModern.Large);
+    rg.guiSetStyle(rg.GuiControl.default, rg.GuiDefaultProperty.text_size, fonts.Size.Medium);
+    rg.guiSetFont(mainFont);
 
     var currentScreen: Screen = .MainMenu;
 
@@ -39,7 +41,7 @@ pub fn main() anyerror!void {
 
             switch (currentScreen) {
                 .MainMenu => {
-                    rl.drawTextEx(fonts.ComputerModern.Large, "Game", rl.Vector2.init(190, 200), fonts.Sizes.Large, 0, rl.Color.light_gray);
+                    rl.drawTextEx(mainFont, "Game", rl.Vector2.init(190, 200), fonts.Size.Medium, 0, rl.Color.light_gray);
                     if (rg.guiButton(rl.Rectangle.init(10, 10, 256, 64), "Play !!") > 0) {
                         currentScreen = .Globe;
                     }
