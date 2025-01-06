@@ -2,8 +2,8 @@ const rl = @import("raylib");
 const rg = @import("raygui");
 const std = @import("std");
 
-const screenWidth = 1920;
-const screenHeight = 1080;
+const screenWidth = 1280;
+const screenHeight = 720;
 const fontSize = 64;
 
 const Screen = enum { MainMenu, Globe, Play };
@@ -11,7 +11,7 @@ const Screen = enum { MainMenu, Globe, Play };
 fn drawTextureCentered(scaleFactor: f32, rotation: f32, texture: rl.Texture) void {
     const scaledWidth = @as(f32, @floatFromInt(texture.width)) * scaleFactor;
     const scaledHeight = @as(f32, @floatFromInt(texture.height)) * scaleFactor;
-    rl.drawTextureEx(texture, rl.Vector2.init(screenWidth / 2 - scaledWidth / 2, screenHeight / 2 - scaledHeight / 2), rotation, scaleFactor, rl.Color.white);
+    rl.drawTextureEx(texture, rl.Vector2.init(rl.getScreenWidth() / 2 - scaledWidth / 2, rl.getScreenHeight() / 2 - scaledHeight / 2), rotation, scaleFactor, rl.Color.white);
 }
 
 pub fn main() anyerror!void {
@@ -54,7 +54,11 @@ pub fn main() anyerror!void {
                     }
                 },
                 .Globe => {
-                    drawTextureCentered(8.0, 0, globeTexture);
+                    drawTextureCentered(7.0, 0, globeTexture);
+                    const x: [2][2]f32 = .{ .{ 0.5, 0.5 }, .{ 0.75, 0.75 } };
+                    for (x) |point| {
+                        rl.drawCircle(point[0] * rl.getScreenWidth(), point[1] * rl.getScreenHeight(), 5, rl.Color.red);
+                    }
                 },
                 .Play => {},
             }
