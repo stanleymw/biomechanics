@@ -2,9 +2,10 @@ const rl = @import("raylib");
 const rg = @import("raygui");
 const std = @import("std");
 
+const fonts = @import("fonts.zig");
+
 const screenWidth = 1920;
 const screenHeight = 1080;
-const fontSize = 64;
 
 const Screen = enum { MainMenu, Globe, Play };
 
@@ -18,20 +19,13 @@ pub fn main() anyerror!void {
     rl.initWindow(screenWidth, screenHeight, "game2");
     defer rl.closeWindow(); // Close window and OpenGL context
 
-    rl.setTargetFPS(240);
-    rg.guiSetStyle(rg.GuiControl.default, rg.GuiDefaultProperty.text_size, fontSize);
+    const mainFont = fonts.loadFont(fonts.Family.ComputerModern, fonts.Size.Medium);
 
-    //const ascii = range(256);
-    const mainFont = rl.loadFontEx(
-        "resources/font.otf",
-        fontSize,
-        null,
-    );
-    const boldFont = rl.loadFontEx(
-        "resources/bold-font.otf",
-        fontSize,
-        null,
-    );
+    rl.drawFPS(0, 0);
+
+    rl.setTargetFPS(240);
+    rg.guiSetStyle(rg.GuiControl.default, rg.GuiDefaultProperty.text_size, fonts.Size.Medium);
+
     rg.guiSetFont(mainFont);
 
     var currentScreen: Screen = .MainMenu;
@@ -48,7 +42,8 @@ pub fn main() anyerror!void {
 
             switch (currentScreen) {
                 .MainMenu => {
-                    rl.drawTextEx(boldFont, "Game", rl.Vector2.init(190, 200), 100, 0, rl.Color.light_gray);
+                    rl.drawTextEx(mainFont, "Game", rl.Vector2.init(190, 200), fonts.Size.Medium, 0, rl.Color.light_gray);
+
                     if (rg.guiButton(rl.Rectangle.init(10, 10, 256, 64), "Play !!") > 0) {
                         currentScreen = .Globe;
                     }
