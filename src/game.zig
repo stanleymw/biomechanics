@@ -11,6 +11,15 @@ const PuzzlePiece = struct { marked: bool };
 
 var World: [15][15]?PuzzlePiece = undefined;
 
+pub fn createWorld() void {
+    for (0..N * N) |i| {
+        World[@mod(i, N)][@divFloor(i, N)] = PuzzlePiece{ .marked = false };
+
+        // rl.drawRectangle((@mod(x, N)) * 160, @divFloor(x, N) * 160, 128, 128, rl.colorFromHSV(@as(f32, @floatFromInt((x + 1))) * 360.0 / (N * N), 1, 0.5));
+    }
+    World[1][1].?.marked = true;
+}
+
 pub fn render() void {
     // rl.drawRectangle(0, 0, 128, 128, rl.Color.red);
 
@@ -49,13 +58,6 @@ pub fn render() void {
             rl.colorAlpha(rl.Color.blue, 0.5),
         );
     }
-
-    for (0..N * N) |i| {
-        World[@mod(i, N)][@divFloor(i, N)] = PuzzlePiece{ .marked = false };
-
-        // rl.drawRectangle((@mod(x, N)) * 160, @divFloor(x, N) * 160, 128, 128, rl.colorFromHSV(@as(f32, @floatFromInt((x + 1))) * 360.0 / (N * N), 1, 0.5));
-    }
-    World[1][1].?.marked = true;
 
     for (World, 0..) |row, e| {
         for (row, 0..) |pieceMaybe, z| {

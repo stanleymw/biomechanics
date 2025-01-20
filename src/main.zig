@@ -31,6 +31,8 @@ pub fn main() anyerror!void {
 
     var currentScreen: Screen = .MainMenu;
 
+    game.createWorld();
+
     // const globeTexture = rl.loadTextureFromImage(rl.loadImage("resources/globe.png"));
 
     // Main game loop
