@@ -5,7 +5,7 @@ const std = @import("std");
 const N = 4;
 
 var horizontal = false;
-var idx: i32 = 0;
+var selectedIndex: usize = 0;
 
 const PuzzlePiece = struct { marked: bool };
 
@@ -20,6 +20,56 @@ pub fn createWorld() void {
     World[1][1].?.marked = true;
 }
 
+fn shiftColumn(idx: usize, amount: i32) void {
+    if (amount >= 0) {
+        var i = (World[0].len - 2);
+        if (World[i + 1][idx] != null) {
+            return;
+        }
+        while (i >= 0) : (i -= 1) {
+            World[@intCast(@as(i32, @intCast(i)) + amount)][idx] = World[i][idx];
+            World[i][idx] = null;
+
+            if (i == 0) {
+                break;
+            }
+        }
+    } else {
+        if (World[0][idx] != null) {
+            return;
+        }
+        for (1..World[0].len - 1) |x| {
+            World[@intCast(@as(i32, @intCast(x)) + amount)][idx] = World[x][idx];
+            World[x][idx] = null;
+        }
+    }
+}
+
+fn shiftRow(idx: usize, amount: i32) void {
+    if (amount >= 0) {
+        var i = (World[0].len - 2);
+        if (World[idx][i + 1] != null) {
+            return;
+        }
+        while (i >= 0) : (i -= 1) {
+            World[idx][@intCast(@as(i32, @intCast(i)) + amount)] = World[idx][i];
+            World[idx][i] = null;
+
+            if (i == 0) {
+                break;
+            }
+        }
+    } else {
+        if (World[idx][0] != null) {
+            return;
+        }
+        for (1..World[0].len - 1) |x| {
+            World[idx][@intCast(@as(i32, @intCast(x)) + amount)] = World[idx][x];
+            World[idx][x] = null;
+        }
+    }
+}
+
 pub fn render() void {
     // rl.drawRectangle(0, 0, 128, 128, rl.Color.red);
 
@@ -29,32 +79,49 @@ pub fn render() void {
 
     if (horizontal) {
         if (rl.isKeyPressed(rl.KeyboardKey.down)) {
-            idx += 1;
+            selectedIndex +%= 1;
         }
         if (rl.isKeyPressed(rl.KeyboardKey.up)) {
-            idx -= 1;
+            selectedIndex -%= 1;
         }
-        idx = @mod(idx, N);
+
+        selectedIndex = @mod(selectedIndex, N);
+
+        if (rl.isKeyPressed(rl.KeyboardKey.right)) {
+            shiftRow(selectedIndex, 1);
+        }
+        if (rl.isKeyPressed(rl.KeyboardKey.left)) {
+            shiftRow(selectedIndex, -1);
+        }
+
         rl.drawRectangle(
             0,
-            idx * 160 - 8,
-            160 * N,
+            @as(i32, @intCast(selectedIndex)) * 160 - 8,
+            rl.getScreenWidth(),
             144,
             rl.colorAlpha(rl.Color.blue, 0.5),
         );
     } else {
         if (rl.isKeyPressed(rl.KeyboardKey.right)) {
-            idx += 1;
+            selectedIndex +%= 1;
         }
         if (rl.isKeyPressed(rl.KeyboardKey.left)) {
-            idx -= 1;
+            selectedIndex -%= 1;
         }
-        idx = @mod(idx, N);
+        selectedIndex = @mod(selectedIndex, N);
+
+        if (rl.isKeyPressed(rl.KeyboardKey.down)) {
+            shiftColumn(selectedIndex, 1);
+        }
+        if (rl.isKeyPressed(rl.KeyboardKey.up)) {
+            shiftColumn(selectedIndex, -1);
+        }
+
         rl.drawRectangle(
-            idx * 160 - 8,
+            @as(i32, @intCast(selectedIndex)) * 160 - 8,
             0,
             144,
-            160 * N,
+            rl.getScreenHeight(),
             rl.colorAlpha(rl.Color.blue, 0.5),
         );
     }
@@ -63,8 +130,8 @@ pub fn render() void {
         for (row, 0..) |pieceMaybe, z| {
             if (pieceMaybe) |piece| {
                 rl.drawRectangle(
-                    @as(i32, @intCast(e)) * 160,
                     @as(i32, @intCast(z)) * 160,
+                    @as(i32, @intCast(e)) * 160,
                     128,
                     128,
                     if (piece.marked) rl.Color.red else rl.Color.light_gray,
