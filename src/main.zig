@@ -3,6 +3,7 @@ const rg = @import("raygui");
 const std = @import("std");
 
 const fonts = @import("fonts.zig");
+const game = @import("game.zig");
 
 const screenWidth = 1920;
 const screenHeight = 1080;
@@ -30,7 +31,7 @@ pub fn main() anyerror!void {
 
     var currentScreen: Screen = .MainMenu;
 
-    const globeTexture = rl.loadTextureFromImage(rl.loadImage("resources/globe.png"));
+    // const globeTexture = rl.loadTextureFromImage(rl.loadImage("resources/globe.png"));
 
     // Main game loop
     while (!rl.windowShouldClose()) {
@@ -44,15 +45,18 @@ pub fn main() anyerror!void {
                 .MainMenu => {
                     rl.drawTextEx(mainFont, "Game", rl.Vector2.init(190, 200), fonts.Size.Medium, 0, rl.Color.light_gray);
 
-                    if (rg.guiButton(rl.Rectangle.init(10, 10, 256, 64), "Play !!") > 0) {
+                    if (rg.guiButton(rl.Rectangle.init(10, 10, 256, 64), "Play") > 0) {
                         currentScreen = .Globe;
                     }
                 },
                 .Globe => {
-                    drawTextureCentered(8.0, 0, globeTexture);
+                    // drawTextureCentered(8.0, 0, globeTexture);
+                    game.render();
                 },
                 .Play => {},
             }
+
+            rl.drawFPS(0, 0);
         }
     }
 }
