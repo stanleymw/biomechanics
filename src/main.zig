@@ -39,6 +39,7 @@ const PoiPin = struct {
             if (self.isLocked)
             poiPinLockedTex
         else if (rl.checkCollisionPointRec(mPos, calculateClickBounds(50, newX, newY))) block: {
+            std.debug.print("pressed!: {}", .{pressed});
             pressed = rl.isMouseButtonPressed(.left);
             break :block poiPinHoverTex;
         } else poiPinTex;
@@ -47,7 +48,7 @@ const PoiPin = struct {
             tex,
             rl.Vector2.init(newX, newY),
             0.0,
-            1.0,
+            4.0,
             rl.Color.white,
         );
 
@@ -79,7 +80,7 @@ pub fn main() anyerror!void {
 
     var mousePos = rl.Vector2.init(0, 0);
     const pois = [_]PoiPin{
-        .{ .x = 0.5, .y = 0.5 },
+        .{ .x = 0.5, .y = 0.5, .isLocked = false },
         .{ .x = 0.75, .y = 0.2 },
     };
 
