@@ -85,7 +85,7 @@ pub fn render() void {
             selectedIndex -%= 1;
         }
 
-        selectedIndex = @mod(selectedIndex, N);
+        selectedIndex = @mod(selectedIndex, World.len);
 
         if (rl.isKeyPressed(rl.KeyboardKey.right)) {
             shiftRow(selectedIndex, 1);
@@ -108,7 +108,7 @@ pub fn render() void {
         if (rl.isKeyPressed(rl.KeyboardKey.left)) {
             selectedIndex -%= 1;
         }
-        selectedIndex = @mod(selectedIndex, N);
+        selectedIndex = @mod(selectedIndex, World[0].len);
 
         if (rl.isKeyPressed(rl.KeyboardKey.down)) {
             shiftColumn(selectedIndex, 1);
