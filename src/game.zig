@@ -2,70 +2,149 @@ const rl = @import("raylib");
 const rg = @import("raygui");
 const std = @import("std");
 
+const types = @import("types.zig");
+
 const N = 4;
 
-var horizontal = false;
 var selectedIndex: usize = 0;
+
+const SelectorState = enum(u2) { Vertical, DiagonalUp, Horizontal, DiagonalDown };
+
+var cursorState: SelectorState = .Vertical;
 
 const PuzzlePiece = struct { marked: bool };
 
-var World: [15][15]?PuzzlePiece = undefined;
+var Level: types.LevelData = undefined;
 
 pub fn createWorld() void {
     for (0..N * N) |i| {
-        World[@mod(i, N)][@divFloor(i, N)] = PuzzlePiece{ .marked = false };
+        Level.state[@mod(i, N)][@divFloor(i, N)] = types.PuzzlePiece{ .marked = false };
 
         // rl.drawRectangle((@mod(x, N)) * 160, @divFloor(x, N) * 160, 128, 128, rl.colorFromHSV(@as(f32, @floatFromInt((x + 1))) * 360.0 / (N * N), 1, 0.5));
     }
-    World[1][1].?.marked = true;
+    Level.state[1][1].?.marked = true;
+
+    Level.horizontal_wires = &[_]u4{ 1, 2, 3 };
+    Level.vertical_wires = &[_]u4{4};
+}
+
+fn isShiftable(indices: []const u4, idx: usize) bool {
+    for (indices) |x| {
+        if (@as(usize, @intCast(x)) == idx) {
+            return true;
+        }
+    }
+    return false;
+}
+
+fn isContiguous(typ: SelectorState, idx: usize) bool {
+    switch (typ) {
+        .Horizontal => {
+            var tracking = false;
+            var left = false;
+            for (Level.state[idx]) |x| {
+                if (x) |_| {
+                    // not null
+                    tracking = true;
+
+                    // if we already tracked a contiguous array and now came across something not in that
+                    if (left) {
+                        return false;
+                    }
+                } else {
+                    if (tracking) {
+                        left = true;
+                    }
+                }
+            }
+            return true;
+        },
+        .Vertical => {
+            var tracking = false;
+            var left = false;
+            for (Level.state) |x| {
+                if (x[idx]) |_| {
+                    tracking = true;
+                    if (left) {
+                        return false;
+                    }
+                } else {
+                    if (tracking) {
+                        left = true;
+                    }
+                }
+            }
+            return true;
+        },
+        else => {
+            unreachable;
+        },
+    }
+    unreachable;
 }
 
 fn shiftColumn(idx: usize, amount: i32) void {
+    if (!isShiftable(Level.vertical_wires, idx)) {
+        return;
+    }
+
+    if (!isContiguous(.Vertical, idx)) {
+        return;
+    }
+
     if (amount >= 0) {
-        var i = (World[0].len - 2);
-        if (World[i + 1][idx] != null) {
+        var i = (Level.state[0].len - 2);
+        if (Level.state[i + 1][idx] != null) {
             return;
         }
         while (i >= 0) : (i -= 1) {
-            World[@intCast(@as(i32, @intCast(i)) + amount)][idx] = World[i][idx];
-            World[i][idx] = null;
+            Level.state[@intCast(@as(i32, @intCast(i)) + amount)][idx] = Level.state[i][idx];
+            Level.state[i][idx] = null;
 
             if (i == 0) {
                 break;
             }
         }
     } else {
-        if (World[0][idx] != null) {
+        if (Level.state[0][idx] != null) {
             return;
         }
-        for (1..World[0].len - 1) |x| {
-            World[@intCast(@as(i32, @intCast(x)) + amount)][idx] = World[x][idx];
-            World[x][idx] = null;
+        for (1..Level.state[0].len - 1) |x| {
+            Level.state[@intCast(@as(i32, @intCast(x)) + amount)][idx] = Level.state[x][idx];
+            Level.state[x][idx] = null;
         }
     }
 }
 
 fn shiftRow(idx: usize, amount: i32) void {
+    if (!isShiftable(Level.horizontal_wires, idx)) {
+        return;
+    }
+
+    if (!isContiguous(.Horizontal, idx)) {
+        return;
+    }
+
     if (amount >= 0) {
-        var i = (World[0].len - 2);
-        if (World[idx][i + 1] != null) {
+        var i = (Level.state[0].len - 2);
+        if (Level.state[idx][i + 1] != null) {
             return;
         }
         while (i >= 0) : (i -= 1) {
-            World[idx][@intCast(@as(i32, @intCast(i)) + amount)] = World[idx][i];
-            World[idx][i] = null;
+            Level.state[idx][@intCast(@as(i32, @intCast(i)) + amount)] = Level.state[idx][i];
+            Level.state[idx][i] = null;
 
             if (i == 0) {
                 break;
             }
         }
     } else {
-        if (World[idx][0] != null) {
+        if (Level.state[idx][0] != null) {
             return;
         }
-        for (1..World[0].len - 1) |x| {
-            World[idx][@intCast(@as(i32, @intCast(x)) + amount)] = World[idx][x];
-            World[idx][x] = null;
+        for (1..Level.state[0].len - 1) |x| {
+            Level.state[idx][@intCast(@as(i32, @intCast(x)) + amount)] = Level.state[idx][x];
+            Level.state[idx][x] = null;
         }
     }
 }
@@ -74,10 +153,10 @@ pub fn render() void {
     // rl.drawRectangle(0, 0, 128, 128, rl.Color.red);
 
     if (rl.isKeyPressed(rl.KeyboardKey.space)) {
-        horizontal = !horizontal;
+        cursorState = @enumFromInt(@intFromEnum(cursorState) +% 1);
     }
 
-    if (horizontal) {
+    if (cursorState == SelectorState.Vertical) {
         if (rl.isKeyPressed(rl.KeyboardKey.down)) {
             selectedIndex +%= 1;
         }
@@ -85,7 +164,7 @@ pub fn render() void {
             selectedIndex -%= 1;
         }
 
-        selectedIndex = @mod(selectedIndex, World.len);
+        selectedIndex = @mod(selectedIndex, Level.state.len);
 
         if (rl.isKeyPressed(rl.KeyboardKey.right)) {
             shiftRow(selectedIndex, 1);
@@ -108,7 +187,7 @@ pub fn render() void {
         if (rl.isKeyPressed(rl.KeyboardKey.left)) {
             selectedIndex -%= 1;
         }
-        selectedIndex = @mod(selectedIndex, World[0].len);
+        selectedIndex = @mod(selectedIndex, Level.state[0].len);
 
         if (rl.isKeyPressed(rl.KeyboardKey.down)) {
             shiftColumn(selectedIndex, 1);
@@ -126,7 +205,7 @@ pub fn render() void {
         );
     }
 
-    for (World, 0..) |row, e| {
+    for (Level.state, 0..) |row, e| {
         for (row, 0..) |pieceMaybe, z| {
             if (pieceMaybe) |piece| {
                 rl.drawRectangle(
