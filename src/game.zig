@@ -116,6 +116,18 @@ fn shiftColumn(idx: usize, amount: i32) void {
     }
 }
 
+fn shiftDiagDown(idx: usize, amount: i32) void {
+    if (!isShiftable(Level.diag_down_wires, idx) or !isContiguous(.DiagonalDown, idx))
+        return;
+    if (amount < 0) {
+        if (Level.state[idx][0] != null) return;
+        for (1..2 * Level.state[0].len - 2) |x| {
+            Level.state[@intCast(@as(i32, @intCast(idx - x)) + amount)][@intCast(@as(i32, @intCast(x)) + amount)] = Level.state[idx - x][x];
+            Level.state[idx - x][x] = null;
+        }
+    }
+}
+
 fn shiftRow(idx: usize, amount: i32) void {
     if (!isShiftable(Level.horizontal_wires, idx)) {
         return;
@@ -150,60 +162,91 @@ fn shiftRow(idx: usize, amount: i32) void {
 }
 
 pub fn render() void {
-    const blockSize: i32 = @divTrunc(rl.getScreenHeight(), 16);
+    const blockSize: i32 = @divTrunc(rl.getScreenHeight(), @as(i32, @intCast(Level.state.len)));
     // rl.drawRectangle(0, 0, 128, 128, rl.Color.red);
 
     if (rl.isKeyPressed(rl.KeyboardKey.space)) {
         cursorState = @enumFromInt(@intFromEnum(cursorState) +% 1);
     }
 
-    if (cursorState == SelectorState.Vertical) {
-        if (rl.isKeyPressed(rl.KeyboardKey.down)) {
-            selectedIndex +%= 1;
-        }
-        if (rl.isKeyPressed(rl.KeyboardKey.up)) {
-            selectedIndex -%= 1;
-        }
+    switch (cursorState) {
+        .Vertical => {
+            if (rl.isKeyPressed(rl.KeyboardKey.down)) {
+                selectedIndex +%= 1;
+            }
+            if (rl.isKeyPressed(rl.KeyboardKey.up)) {
+                selectedIndex -%= 1;
+            }
 
-        selectedIndex = @mod(selectedIndex, Level.state.len);
+            selectedIndex = @mod(selectedIndex, Level.state.len);
 
-        if (rl.isKeyPressed(rl.KeyboardKey.right)) {
-            shiftRow(selectedIndex, 1);
-        }
-        if (rl.isKeyPressed(rl.KeyboardKey.left)) {
-            shiftRow(selectedIndex, -1);
-        }
+            if (rl.isKeyPressed(rl.KeyboardKey.right)) {
+                shiftRow(selectedIndex, 1);
+            }
+            if (rl.isKeyPressed(rl.KeyboardKey.left)) {
+                shiftRow(selectedIndex, -1);
+            }
 
-        rl.drawRectangle(
-            0,
-            @as(i32, @intCast(selectedIndex)) * blockSize - 4,
-            rl.getScreenWidth(),
-            blockSize - 8,
-            rl.colorAlpha(rl.Color.blue, 0.5),
-        );
-    } else {
-        if (rl.isKeyPressed(rl.KeyboardKey.right)) {
-            selectedIndex +%= 1;
-        }
-        if (rl.isKeyPressed(rl.KeyboardKey.left)) {
-            selectedIndex -%= 1;
-        }
-        selectedIndex = @mod(selectedIndex, Level.state[0].len);
+            rl.drawRectangle(
+                0,
+                @as(i32, @intCast(selectedIndex)) * blockSize - 4,
+                rl.getScreenWidth(),
+                blockSize - 8,
+                rl.colorAlpha(rl.Color.blue, 0.5),
+            );
+        },
+        .Horizontal => {
+            if (rl.isKeyPressed(rl.KeyboardKey.right)) {
+                selectedIndex +%= 1;
+            }
+            if (rl.isKeyPressed(rl.KeyboardKey.left)) {
+                selectedIndex -%= 1;
+            }
+            selectedIndex = @mod(selectedIndex, Level.state[0].len);
 
-        if (rl.isKeyPressed(rl.KeyboardKey.down)) {
-            shiftColumn(selectedIndex, 1);
-        }
-        if (rl.isKeyPressed(rl.KeyboardKey.up)) {
-            shiftColumn(selectedIndex, -1);
-        }
+            if (rl.isKeyPressed(rl.KeyboardKey.down)) {
+                shiftColumn(selectedIndex, 1);
+            }
+            if (rl.isKeyPressed(rl.KeyboardKey.up)) {
+                shiftColumn(selectedIndex, -1);
+            }
 
-        rl.drawRectangle(
-            @as(i32, @intCast(selectedIndex)) * blockSize - 4,
-            0,
-            blockSize - 8,
-            rl.getScreenHeight(),
-            rl.colorAlpha(rl.Color.blue, 0.5),
-        );
+            rl.drawRectangle(
+                @as(i32, @intCast(selectedIndex)) * blockSize - 4,
+                0,
+                blockSize - 8,
+                rl.getScreenHeight(),
+                rl.colorAlpha(rl.Color.blue, 0.5),
+            );
+        },
+        .DiagonalUp => {},
+        .DiagonalDown => {
+            if (rl.isKeyPressed(rl.KeyboardKey.right)) {
+                selectedIndex +%= 1;
+            }
+            if (rl.isKeyPressed(rl.KeyboardKey.left)) {
+                selectedIndex -%= 1;
+            }
+            selectedIndex = @mod(selectedIndex, Level.state[0].len);
+
+            if (rl.isKeyPressed(rl.KeyboardKey.down)) {
+                shiftDiagDown(selectedIndex, 1);
+            }
+            if (rl.isKeyPressed(rl.KeyboardKey.up)) {
+                shiftDiagDown(selectedIndex, -1);
+            }
+            rl.drawRectanglePro(
+                rl.Rectangle.init(
+                    0,
+                    @as(f32, @floatFromInt(selectedIndex)) * @as(f32, @floatFromInt(blockSize)) - 4,
+                    @as(f32, (@floatFromInt(blockSize - 16))) * std.math.sqrt2,
+                    @as(f32, @floatFromInt(rl.getScreenHeight())) * @sqrt(2.0),
+                ),
+                rl.Vector2.zero(),
+                -45, //-std.math.pi / 4.0,
+                rl.Color.pink,
+            );
+        },
     }
 
     for (Level.state, 0..) |row, e| {

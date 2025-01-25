@@ -82,7 +82,7 @@ pub const ScrollingTextView = struct {
                 .height = height,
             },
             .content_height = height,
-            .scroll = rl.Vector2.init(0, 0),
+            .scroll = rl.Vector2.zero(),
             .view = rl.Rectangle.init(0, 0, 0, 0),
             .font_size = 30,
             .text_color = rl.Color.black,
@@ -100,7 +100,7 @@ pub const ScrollingTextView = struct {
             if (char == '\n') line_count += 1;
         }
         self.content_height = @as(f32, @floatFromInt(line_count)) *
-            @as(f32, @floatFromInt(self.font_size)) * 1.5;
+            @as(f32, @floatFromInt(5 + self.font_size));
     }
 
     pub fn render(self: *ScrollingTextView) void {
@@ -112,7 +112,13 @@ pub const ScrollingTextView = struct {
         };
 
         // Convert scroll result to Vector2
-        const scroll_result = rg.guiScrollPanel(self.bounds, null, content, &self.scroll, &self.view);
+        const scroll_result = rg.guiScrollPanel(
+            self.bounds,
+            null,
+            content,
+            &self.scroll,
+            &self.view,
+        );
         self.scroll = .{
             .x = @floatFromInt(scroll_result),
             .y = self.scroll.y,
@@ -125,9 +131,7 @@ pub const ScrollingTextView = struct {
             @as(i32, @intFromFloat(self.bounds.height)),
         );
 
-        const y: f32 = self.bounds.y - self.scroll.y;
-        //var line_start: usize = 0;
-        var current_y: f32 = y;
+        var current_y: f32 = self.bounds.y + self.scroll.y;
 
         // Render each line
 
@@ -141,22 +145,8 @@ pub const ScrollingTextView = struct {
                 1.0,
                 self.text_color,
             );
-            current_y += @as(f32, @floatFromInt(self.font_size)) * 1.5 + 5;
+            current_y += @as(f32, @floatFromInt(self.font_size)) + 5;
         }
-        // for (self.text, 0..) |char, i| {
-        //     if (char == '\n' or i == self.text.len - 1) {
-        //         const line_end = if (char == '\n') i else i + 1;
-        //         rl.drawText(
-        //             @ptrCast(self.text[line_start..line_end]),
-        //             @as(i32, @intFromFloat(self.bounds.x + 4)),
-        //             @as(i32, @intFromFloat(current_y)),
-        //             self.font_size,
-        //             self.text_color,
-        //         );
-        //         line_start = i + 1;
-        //         current_y += @as(f32, @floatFromInt(self.font_size)) * 1.5 + 10;
-        //     }
-        // }
 
         rl.endScissorMode();
     }
