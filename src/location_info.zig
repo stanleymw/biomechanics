@@ -1,3 +1,22 @@
+const rl = @import("raylib");
+
+const PuzzlePiece = bool;
+
+// u4 used cuz 16 possible values
+const LevelData = struct {
+    x_wires: []u4,
+    y_wires: []u4,
+    starting_state: [15][15]?PuzzlePiece,
+    target_state: [15][15]?PuzzlePiece,
+};
+
+const LocationData = struct {
+    name: []const u8,
+    info: []const u8,
+    image_name: []const u8,
+    levels: []LevelData,
+};
+
 pub const locationInfoText = [_][]const u8{
     // Solar
     \\ Photovoltaic Cells: These are the fundamental units that convert sunlight into electrical energy through the photovoltaic effect. Typically made from silicon, they are interconnected to form a solar panel.
