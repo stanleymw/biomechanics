@@ -18,11 +18,11 @@ var Level: types.LevelData = undefined;
 
 pub fn createWorld() void {
     for (0..N * N) |i| {
-        Level.state[@mod(i, N)][@divFloor(i, N)] = types.PuzzlePiece{ .marked = false };
+        Level.state[6 + @mod(i, N)][6 + @divFloor(i, N)] = types.PuzzlePiece{ .marked = false };
 
         // rl.drawRectangle((@mod(x, N)) * 160, @divFloor(x, N) * 160, 128, 128, rl.colorFromHSV(@as(f32, @floatFromInt((x + 1))) * 360.0 / (N * N), 1, 0.5));
     }
-    Level.state[1][1].?.marked = true;
+    Level.state[8][8].?.marked = true;
 
     Level.horizontal_wires = &[_]u4{ 1, 2, 3 };
     Level.vertical_wires = &[_]u4{4};

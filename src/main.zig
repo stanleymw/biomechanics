@@ -5,7 +5,7 @@ const std = @import("std");
 const fonts = @import("fonts.zig");
 const game = @import("game.zig");
 
-const screenWidth = 1920;
+const screenWidth = 1080;
 const screenHeight = 1080;
 
 const Screen = union(enum) { MainMenu, Globe, Play: Place, LocationInfo: Location, Info };
