@@ -4,7 +4,7 @@ const std = @import("std");
 
 const types = @import("types.zig");
 
-const N = 4;
+const N = 3;
 
 var selectedIndex: usize = 0;
 
@@ -22,10 +22,10 @@ pub fn createWorld() void {
 
         // rl.drawRectangle((@mod(x, N)) * 160, @divFloor(x, N) * 160, 128, 128, rl.colorFromHSV(@as(f32, @floatFromInt((x + 1))) * 360.0 / (N * N), 1, 0.5));
     }
-    Level.state[8][8].?.marked = true;
+    Level.state[6][7].?.marked = true;
 
-    Level.horizontal_wires = &[_]u4{ 1, 2, 3 };
-    Level.vertical_wires = &[_]u4{4};
+    Level.horizontal_wires = &[_]u4{ 6, 7, 8 };
+    Level.vertical_wires = &[_]u4{ 6, 7, 8 };
 }
 
 fn isShiftable(indices: []const u4, idx: usize) bool {
