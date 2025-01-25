@@ -150,6 +150,7 @@ fn shiftRow(idx: usize, amount: i32) void {
 }
 
 pub fn render() void {
+    const blockSize: i32 = @divTrunc(rl.getScreenHeight(), 16);
     // rl.drawRectangle(0, 0, 128, 128, rl.Color.red);
 
     if (rl.isKeyPressed(rl.KeyboardKey.space)) {
@@ -175,9 +176,9 @@ pub fn render() void {
 
         rl.drawRectangle(
             0,
-            @as(i32, @intCast(selectedIndex)) * 160 - 8,
+            @as(i32, @intCast(selectedIndex)) * blockSize - 4,
             rl.getScreenWidth(),
-            144,
+            blockSize - 8,
             rl.colorAlpha(rl.Color.blue, 0.5),
         );
     } else {
@@ -197,9 +198,9 @@ pub fn render() void {
         }
 
         rl.drawRectangle(
-            @as(i32, @intCast(selectedIndex)) * 160 - 8,
+            @as(i32, @intCast(selectedIndex)) * blockSize - 4,
             0,
-            144,
+            blockSize - 8,
             rl.getScreenHeight(),
             rl.colorAlpha(rl.Color.blue, 0.5),
         );
@@ -209,10 +210,10 @@ pub fn render() void {
         for (row, 0..) |pieceMaybe, z| {
             if (pieceMaybe) |piece| {
                 rl.drawRectangle(
-                    @as(i32, @intCast(z)) * 160,
-                    @as(i32, @intCast(e)) * 160,
-                    128,
-                    128,
+                    @as(i32, @intCast(z)) * blockSize,
+                    @as(i32, @intCast(e)) * blockSize,
+                    blockSize - 16,
+                    blockSize - 16,
                     if (piece.marked) rl.Color.red else rl.Color.light_gray,
                 );
             }
