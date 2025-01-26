@@ -19,7 +19,7 @@ pub fn imgBtn(
 
     const pressed = if (rl.checkCollisionPointRec(
         mPos,
-        rl.Rectangle.init(pos.x - regScaledWidth / 2, pos.y - regScaledHeight / 2, regScaledWidth, regScaledWidth),
+        rl.Rectangle.init(pos.x - regScaledWidth / 2, pos.y - regScaledHeight / 2, regScaledWidth, regScaledHeight),
     )) blk: {
         if (rl.isMouseButtonDown(.left)) {
             texture = press_texture;
