@@ -11,6 +11,8 @@ var selectedIndex: usize = 0;
 const SelectorState = enum(u2) { Vertical, DiagonalUp, Horizontal, DiagonalDown };
 
 var cursorState: SelectorState = .Vertical;
+const cursorThickness = 40;
+const halfThick = cursorThickness / 2;
 
 const PuzzlePiece = struct { marked: bool };
 
@@ -170,7 +172,7 @@ pub fn render() void {
     }
 
     switch (cursorState) {
-        .Vertical => {
+        .Horizontal => {
             if (rl.isKeyPressed(rl.KeyboardKey.down)) {
                 selectedIndex +%= 1;
             }
@@ -187,22 +189,23 @@ pub fn render() void {
                 shiftRow(selectedIndex, -1);
             }
 
-            rl.drawRectangle(
-                0,
-                @as(i32, @intCast(selectedIndex)) * blockSize - 4,
-                rl.getScreenWidth(),
-                blockSize - 8,
+            const yVal: f32 = @floatFromInt(@as(i32, @intCast(selectedIndex)) * blockSize);
+            rl.drawLineEx(
+                rl.Vector2.init(0, yVal),
+                rl.Vector2.init(@as(f32, @floatFromInt(rl.getRenderWidth())), yVal),
+                cursorThickness,
                 rl.colorAlpha(rl.Color.blue, 0.5),
             );
+            std.debug.print("Horizontal: {}\n", .{yVal});
         },
-        .Horizontal => {
+        .Vertical => {
             if (rl.isKeyPressed(rl.KeyboardKey.right)) {
                 selectedIndex +%= 1;
             }
             if (rl.isKeyPressed(rl.KeyboardKey.left)) {
                 selectedIndex -%= 1;
             }
-            selectedIndex = @mod(selectedIndex, Level.state[0].len);
+            selectedIndex = @mod(selectedIndex, Level.state.len);
 
             if (rl.isKeyPressed(rl.KeyboardKey.down)) {
                 shiftColumn(selectedIndex, 1);
@@ -211,28 +214,29 @@ pub fn render() void {
                 shiftColumn(selectedIndex, -1);
             }
 
-            rl.drawRectangle(
-                @as(i32, @intCast(selectedIndex)) * blockSize - 4,
-                0,
-                blockSize - 8,
-                rl.getScreenHeight(),
-                rl.colorAlpha(rl.Color.blue, 0.5),
-            );
+            const yVal = (@as(i32, @intCast(selectedIndex)) * blockSize) + (blockSize >> 1);
+            std.debug.print("{}\n", .{yVal});
+            // rl.drawLineEx(
+            //     rl.Vector2.init(yVal, 0),
+            //     rl.Vector2.init(yVal, @as(f32, @floatFromInt(rl.getRenderWidth()))),
+            //     cursorThickness,
+            //     rl.colorAlpha(rl.Color.blue, 0.5),
+            // );
         },
         .DiagonalUp => {},
         .DiagonalDown => {
-            if (rl.isKeyPressed(rl.KeyboardKey.right)) {
+            if (rl.isKeyPressed(rl.KeyboardKey.down)) {
                 selectedIndex +%= 1;
             }
-            if (rl.isKeyPressed(rl.KeyboardKey.left)) {
+            if (rl.isKeyPressed(rl.KeyboardKey.up)) {
                 selectedIndex -%= 1;
             }
-            selectedIndex = @mod(selectedIndex, Level.state[0].len);
+            selectedIndex = @mod(selectedIndex, Level.state.len);
 
-            if (rl.isKeyPressed(rl.KeyboardKey.down)) {
+            if (rl.isKeyPressed(rl.KeyboardKey.right)) {
                 shiftDiagDown(selectedIndex, 1);
             }
-            if (rl.isKeyPressed(rl.KeyboardKey.up)) {
+            if (rl.isKeyPressed(rl.KeyboardKey.left)) {
                 shiftDiagDown(selectedIndex, -1);
             }
             rl.drawRectanglePro(
@@ -243,12 +247,13 @@ pub fn render() void {
                     @as(f32, @floatFromInt(rl.getScreenHeight())) * @sqrt(2.0),
                 ),
                 rl.Vector2.zero(),
-                -45, //-std.math.pi / 4.0,
+                -45,
                 rl.Color.pink,
             );
         },
     }
 
+    // render pieces
     for (Level.state, 0..) |row, e| {
         for (row, 0..) |pieceMaybe, z| {
             if (pieceMaybe) |piece| {
