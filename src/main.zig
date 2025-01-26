@@ -24,6 +24,28 @@ fn renderSize() rl.Vector2 {
     );
 }
 
+fn imgBtn(
+    scaleFactor: f32,
+    pos: rl.Vector2,
+    texture: rl.Texture2D,
+    mPos: rl.Vector2,
+) bool {
+    const scaledWidth = @as(f32, @floatFromInt(texture.width)) * scaleFactor;
+    const scaledHeight = @as(f32, @floatFromInt(texture.height)) * scaleFactor;
+
+    rl.drawTextureEx(
+        texture,
+        pos.subtract(rl.Vector2.init(scaledWidth / 2, scaledHeight / 2)),
+        0.0,
+        scaleFactor,
+        rl.Color.white,
+    );
+    return rl.isMouseButtonDown(.left) and rl.checkCollisionPointRec(
+        mPos,
+        rl.Rectangle.init(pos.x - scaledWidth / 2, pos.y - scaledHeight / 2, scaledWidth, scaledWidth),
+    );
+}
+
 fn drawTextureProCenteredAtPoint(
     scaleFactor: f32,
     rotation: f32,
@@ -144,6 +166,9 @@ pub fn main() anyerror!void {
     const spaceBg = rl.loadTextureFromImage(rl.loadImage("resources/space.png"));
     defer rl.unloadTexture(spaceBg);
 
+    const playBtn = rl.loadTextureFromImage(rl.loadImage("resources/play-btn.png"));
+    defer rl.unloadTexture(playBtn);
+
     poiPinTex = rl.loadTextureFromImage(rl.loadImage("resources/poi-ani.png"));
     defer rl.unloadTexture(poiPinTex);
 
@@ -186,7 +211,7 @@ pub fn main() anyerror!void {
                 .MainMenu => {
                     const anchor = rl.Vector2.init(@as(f32, @floatFromInt(rl.getScreenWidth())) / 2.0, 300);
                     drawTextureCenteredAtPoint(0.8, 0.0, anchor, gameLogo);
-                    if (rg.guiButton(rl.Rectangle.init(anchor.x - 128, anchor.y + 150, 256, 64), "Play") > 0) {
+                    if (imgBtn(1.0, rl.Vector2.init(anchor.x, anchor.y + 175), playBtn, mousePos)) {
                         currentScreen = .Info;
                     }
                 },
@@ -228,6 +253,7 @@ pub fn main() anyerror!void {
                     );
                     text_view.setText(text);
                     text_view.render();
+
                     if (rg.guiButton(
                         rl.Rectangle.init(info_anchor.x, info_anchor.y + 600, 500, 100),
                         "continue",
