@@ -105,21 +105,9 @@ const PoiPin = struct {
             drawTextureCenteredAtPoint(4.0, 0.0, scaledPoint, poiPinCompletedTex);
         } else if (rl.checkCollisionPointRec(mPos, calculateClickBounds(100, scaledPoint.x, scaledPoint.y))) {
             pressed = rl.isMouseButtonPressed(.left);
-            //drawTextureCenteredAtPoint(4.0, 0.0, scaledPoint, poiPinHoverTex);
             drawTextureProCenteredAtPoint(4.0, 0.0, scaledPoint, poiPinHoverTex, self.frameRect);
         } else {
-            //drawTextureCenteredAtPoint(4.0, 0.0, scaledPoint, poiPinTex);
             drawTextureProCenteredAtPoint(4.0, 0.0, scaledPoint, poiPinTex, self.frameRect);
-            //rl.drawTextureRec(poiPinTex, self.frameRect, scaledPoint, rl.Color.white);
-            std.debug.print(
-                "frame rect: {d}, {d}, {d}, {d}\n",
-                .{
-                    self.frameRect.x,
-                    self.frameRect.y,
-                    self.frameRect.width,
-                    self.frameRect.height,
-                },
-            );
         }
 
         return pressed;
