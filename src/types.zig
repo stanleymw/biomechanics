@@ -1,6 +1,6 @@
 const rl = @import("raylib");
 
-pub const PuzzlePiece = struct { marked: bool };
+pub const PuzzlePiece = struct { marking: u8 = 0 };
 
 // u4 used cuz 16 possible values
 pub const LevelData = struct {
