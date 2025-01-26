@@ -5,75 +5,11 @@ const std = @import("std");
 const fonts = @import("fonts.zig");
 const game = @import("game.zig");
 const gui = @import("gui.zig");
+const utils = @import("utils.zig");
+const types = @import("types.zig");
 
 const screenWidth = 1080;
 const screenHeight = 1080;
-
-const Screen = union(enum) { MainMenu, Globe, Play: Place, LocationInfo: Location, Info };
-
-const Location = enum(u4) { SolarPanels, CarbonCapture, Nuclear, Desalination };
-const Place = struct {
-    location: Location,
-    level: u3,
-};
-
-fn renderSize() rl.Vector2 {
-    return rl.Vector2.init(
-        @as(f32, @floatFromInt(rl.getScreenWidth())),
-        @as(f32, @floatFromInt(rl.getScreenHeight())),
-    );
-}
-
-fn imgBtn(
-    scaleFactor: f32,
-    pos: rl.Vector2,
-    texture: rl.Texture2D,
-    mPos: rl.Vector2,
-) bool {
-    const scaledWidth = @as(f32, @floatFromInt(texture.width)) * scaleFactor;
-    const scaledHeight = @as(f32, @floatFromInt(texture.height)) * scaleFactor;
-
-    rl.drawTextureEx(
-        texture,
-        pos.subtract(rl.Vector2.init(scaledWidth / 2, scaledHeight / 2)),
-        0.0,
-        scaleFactor,
-        rl.Color.white,
-    );
-    return rl.isMouseButtonDown(.left) and rl.checkCollisionPointRec(
-        mPos,
-        rl.Rectangle.init(pos.x - scaledWidth / 2, pos.y - scaledHeight / 2, scaledWidth, scaledWidth),
-    );
-}
-
-fn drawTextureProCenteredAtPoint(
-    scaleFactor: f32,
-    rotation: f32,
-    pos: rl.Vector2,
-    texture: rl.Texture2D,
-    rec: rl.Rectangle,
-) void {
-    const scaledWidth = rec.width * scaleFactor;
-    const scaledHeight = rec.height * scaleFactor;
-    rl.drawTexturePro(
-        texture,
-        rec,
-        rl.Rectangle.init(pos.x, pos.y, scaledWidth, scaledHeight),
-        rl.Vector2.init(scaledWidth / 2, scaledHeight / 2),
-        rotation,
-        rl.Color.white,
-    );
-}
-
-fn drawTextureCenteredAtPoint(scaleFactor: f32, rotation: f32, pos: rl.Vector2, texture: rl.Texture2D) void {
-    const scaledWidth = @as(f32, @floatFromInt(texture.width)) * scaleFactor;
-    const scaledHeight = @as(f32, @floatFromInt(texture.height)) * scaleFactor;
-    rl.drawTextureEx(texture, pos.subtract(rl.Vector2.init(scaledWidth / 2, scaledHeight / 2)), rotation, scaleFactor, rl.Color.white);
-}
-
-fn drawTextureCentered(scaleFactor: f32, rotation: f32, texture: rl.Texture2D) void {
-    drawTextureCenteredAtPoint(scaleFactor, rotation, renderSize().scale(0.5), texture);
-}
 
 var poiPinTex: rl.Texture2D = undefined;
 var poiPinLockedTex: rl.Texture2D = undefined;
@@ -85,14 +21,14 @@ const PoiPin = struct {
     y: f32,
     isLocked: bool = true,
     isCompleted: bool = false,
-    location: Location,
+    location: types.Location,
     frameCounter: u16 = 0,
     currentFrame: u16 = 0,
     fps: u9 = 24,
     frameRect: rl.Rectangle,
 
     const Self = @This();
-    fn init(location: Location, x: f32, y: f32, isLocked: bool) Self {
+    fn init(location: types.Location, x: f32, y: f32, isLocked: bool) Self {
         return Self{
             .x = x,
             .y = y,
@@ -119,17 +55,17 @@ const PoiPin = struct {
             }
         } else self.currentFrame = 0;
 
-        const scaledPoint = renderSize().multiply(rl.Vector2.init(self.x, self.y));
+        const scaledPoint = utils.renderSize().multiply(rl.Vector2.init(self.x, self.y));
 
         if (self.isLocked) {
-            drawTextureCenteredAtPoint(4.0, 0.0, scaledPoint, poiPinLockedTex);
+            gui.drawTextureCenteredAtPoint(4.0, 0.0, scaledPoint, poiPinLockedTex);
         } else if (self.isCompleted) {
-            drawTextureCenteredAtPoint(4.0, 0.0, scaledPoint, poiPinCompletedTex);
+            gui.drawTextureCenteredAtPoint(4.0, 0.0, scaledPoint, poiPinCompletedTex);
         } else if (rl.checkCollisionPointRec(mPos, calculateClickBounds(100, scaledPoint.x, scaledPoint.y))) {
             pressed = rl.isMouseButtonPressed(.left);
-            drawTextureProCenteredAtPoint(4.0, 0.0, scaledPoint, poiPinHoverTex, self.frameRect);
+            gui.drawTextureProCenteredAtPoint(4.0, 0.0, scaledPoint, poiPinHoverTex, self.frameRect);
         } else {
-            drawTextureProCenteredAtPoint(4.0, 0.0, scaledPoint, poiPinTex, self.frameRect);
+            gui.drawTextureProCenteredAtPoint(4.0, 0.0, scaledPoint, poiPinTex, self.frameRect);
         }
 
         return pressed;
@@ -152,7 +88,7 @@ pub fn main() anyerror!void {
 
     rg.guiSetFont(mainFont);
 
-    var currentScreen: Screen = .MainMenu;
+    var currentScreen: types.Screen = .MainMenu;
 
     game.createWorld();
 
@@ -168,6 +104,12 @@ pub fn main() anyerror!void {
 
     const playBtn = rl.loadTextureFromImage(rl.loadImage("resources/play-btn.png"));
     defer rl.unloadTexture(playBtn);
+
+    const playBtnHover = rl.loadTextureFromImage(rl.loadImage("resources/play-btn-hover.png"));
+    defer rl.unloadTexture(playBtnHover);
+
+    const playBtnPress = rl.loadTextureFromImage(rl.loadImage("resources/play-btn-press.png"));
+    defer rl.unloadTexture(playBtnPress);
 
     poiPinTex = rl.loadTextureFromImage(rl.loadImage("resources/poi-ani.png"));
     defer rl.unloadTexture(poiPinTex);
@@ -210,15 +152,22 @@ pub fn main() anyerror!void {
             switch (currentScreen) {
                 .MainMenu => {
                     const anchor = rl.Vector2.init(@as(f32, @floatFromInt(rl.getScreenWidth())) / 2.0, 300);
-                    drawTextureCenteredAtPoint(0.8, 0.0, anchor, gameLogo);
-                    if (imgBtn(1.0, rl.Vector2.init(anchor.x, anchor.y + 175), playBtn, mousePos)) {
+                    gui.drawTextureCenteredAtPoint(0.8, 0.0, anchor, gameLogo);
+                    if (gui.imgBtn(
+                        1.0,
+                        rl.Vector2.init(anchor.x, anchor.y + 175),
+                        playBtn,
+                        playBtnHover,
+                        playBtnPress,
+                        mousePos,
+                    )) {
                         currentScreen = .Info;
                     }
                 },
                 .Globe => {
-                    drawTextureCentered(8.435, 0, spaceBg);
-                    drawTextureCentered(8.0, 0, globeTexture);
-                    var location: ?Location = null;
+                    gui.drawTextureCentered(8.435, 0, spaceBg);
+                    gui.drawTextureCentered(8.0, 0, globeTexture);
+                    var location: ?types.Location = null;
                     for (0..pois.len) |idx| {
                         if (pois[idx].render(mousePos)) {
                             location = pois[idx].location;
@@ -226,7 +175,7 @@ pub fn main() anyerror!void {
                         }
                     }
                     if (location != null) {
-                        currentScreen = Screen{ .LocationInfo = location.? };
+                        currentScreen = types.Screen{ .LocationInfo = location.? };
                     }
                 },
                 .Play => {
@@ -258,8 +207,8 @@ pub fn main() anyerror!void {
                         rl.Rectangle.init(info_anchor.x, info_anchor.y + 600, 500, 100),
                         "continue",
                     ) == 1) {
-                        currentScreen = Screen{
-                            .Play = Place{
+                        currentScreen = .{
+                            .Play = .{
                                 .level = 0,
                                 .location = location.*,
                             },

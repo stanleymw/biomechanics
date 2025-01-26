@@ -2,6 +2,74 @@ const std = @import("std");
 const rl = @import("raylib");
 const rg = @import("raygui");
 
+const utils = @import("utils.zig");
+
+pub fn imgBtn(
+    scaleFactor: f32,
+    pos: rl.Vector2,
+    reg_texture: rl.Texture2D,
+    hov_texture: rl.Texture2D,
+    press_texture: rl.Texture2D,
+    mPos: rl.Vector2,
+) bool {
+    var texture: rl.Texture2D = reg_texture;
+
+    const regScaledWidth = @as(f32, @floatFromInt(reg_texture.width)) * scaleFactor;
+    const regScaledHeight = @as(f32, @floatFromInt(reg_texture.height)) * scaleFactor;
+
+    const pressed = if (rl.checkCollisionPointRec(
+        mPos,
+        rl.Rectangle.init(pos.x - regScaledWidth / 2, pos.y - regScaledHeight / 2, regScaledWidth, regScaledWidth),
+    )) blk: {
+        if (rl.isMouseButtonDown(.left)) {
+            texture = press_texture;
+            break :blk true;
+        }
+        texture = hov_texture;
+        break :blk false;
+    } else false;
+    const scaledWidth = @as(f32, @floatFromInt(texture.width)) * scaleFactor;
+    const scaledHeight = @as(f32, @floatFromInt(texture.height)) * scaleFactor;
+
+    rl.drawTextureEx(
+        texture,
+        pos.subtract(rl.Vector2.init(scaledWidth / 2, scaledHeight / 2)),
+        0.0,
+        scaleFactor,
+        rl.Color.white,
+    );
+    return pressed;
+}
+
+pub fn drawTextureProCenteredAtPoint(
+    scaleFactor: f32,
+    rotation: f32,
+    pos: rl.Vector2,
+    texture: rl.Texture2D,
+    rec: rl.Rectangle,
+) void {
+    const scaledWidth = rec.width * scaleFactor;
+    const scaledHeight = rec.height * scaleFactor;
+    rl.drawTexturePro(
+        texture,
+        rec,
+        rl.Rectangle.init(pos.x, pos.y, scaledWidth, scaledHeight),
+        rl.Vector2.init(scaledWidth / 2, scaledHeight / 2),
+        rotation,
+        rl.Color.white,
+    );
+}
+
+pub fn drawTextureCenteredAtPoint(scaleFactor: f32, rotation: f32, pos: rl.Vector2, texture: rl.Texture2D) void {
+    const scaledWidth = @as(f32, @floatFromInt(texture.width)) * scaleFactor;
+    const scaledHeight = @as(f32, @floatFromInt(texture.height)) * scaleFactor;
+    rl.drawTextureEx(texture, pos.subtract(rl.Vector2.init(scaledWidth / 2, scaledHeight / 2)), rotation, scaleFactor, rl.Color.white);
+}
+
+pub fn drawTextureCentered(scaleFactor: f32, rotation: f32, texture: rl.Texture2D) void {
+    drawTextureCenteredAtPoint(scaleFactor, rotation, utils.renderSize().scale(0.5), texture);
+}
+
 pub const ScrollingTextView = struct {
     bounds: rl.Rectangle,
     content_height: f32,

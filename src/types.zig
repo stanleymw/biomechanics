@@ -1,5 +1,13 @@
 const rl = @import("raylib");
 
+pub const Screen = union(enum) { MainMenu, Globe, Play: Place, LocationInfo: Location, Info };
+
+pub const Location = enum(u4) { SolarPanels, CarbonCapture, Nuclear, Desalination };
+pub const Place = struct {
+    location: Location,
+    level: u3,
+};
+
 pub const PuzzlePiece = struct { marking: u8 = 0 };
 
 // u4 used cuz 16 possible values
