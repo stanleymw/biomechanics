@@ -144,7 +144,7 @@ fn shiftColumn(idx: usize, amount: i32) void {
         if (Level.state[0][idx] != null) {
             return;
         }
-        for (1..Level.state[0].len - 1) |x| {
+        for (1..Level.state[0].len) |x| {
             Level.state[@intCast(@as(i32, @intCast(x)) + amount)][idx] = Level.state[x][idx];
             Level.state[x][idx] = null;
         }
@@ -198,7 +198,7 @@ fn shiftRow(idx: usize, amount: i32) void {
         if (Level.state[idx][0] != null) {
             return;
         }
-        for (1..Level.state[0].len - 1) |x| {
+        for (1..Level.state[0].len) |x| {
             Level.state[idx][@intCast(@as(i32, @intCast(x)) + amount)] = Level.state[idx][x];
             Level.state[idx][x] = null;
         }
@@ -412,9 +412,9 @@ pub fn render() void {
     }
 
     if (rendering_target) {
-        rl.drawText("Target State", 0, 0, 48, rl.Color.black);
+        rl.drawText("Target State", 0, 0, 48, rl.Color.white);
     }
     if (hasWon()) {
-        rl.drawText("Won!", 0, 60, 48, rl.Color.black);
+        rl.drawText("Won!", 0, 60, 48, rl.Color.white);
     }
 }
