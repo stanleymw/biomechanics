@@ -8,13 +8,8 @@ const N = 3;
 
 var selectedIndex: usize = 0;
 
-const SelectorState = enum(u2) { Vertical, DiagonalUp, Horizontal, DiagonalDown };
-
-var cursorState: SelectorState = .Vertical;
-const cursorThickness = 40;
-const halfThick = cursorThickness / 2;
-
-const PuzzlePiece = struct { marked: bool };
+const Direction = enum(u2) { Vertical, DiagonalUp, Horizontal, DiagonalDown };
+var cursorState: Direction = .Vertical;
 
 var Level: types.LevelData = undefined;
 
@@ -26,11 +21,13 @@ pub fn createWorld() void {
     }
     Level.state[6][7].?.marked = true;
 
-    Level.horizontal_wires = &[_]u4{ 6, 7, 8 };
-    Level.vertical_wires = &[_]u4{ 6, 7, 8 };
+    Level.horizontal_wires = &[_]u8{ 6, 7, 8 };
+    Level.vertical_wires = &[_]u8{ 6, 7, 8 };
+    Level.diag_up_wires = &[_]u8{ 12, 13, 14 };
+    Level.diag_down_wires = &[_]u8{ 12, 13, 14 };
 }
 
-fn isShiftable(indices: []const u4, idx: usize) bool {
+fn isShiftable(indices: []const u8, idx: usize) bool {
     for (indices) |x| {
         if (@as(usize, @intCast(x)) == idx) {
             return true;
@@ -39,7 +36,7 @@ fn isShiftable(indices: []const u4, idx: usize) bool {
     return false;
 }
 
-fn isContiguous(typ: SelectorState, idx: usize) bool {
+fn isContiguous(typ: Direction, idx: usize) bool {
     switch (typ) {
         .Horizontal => {
             var tracking = false;
@@ -163,105 +160,135 @@ fn shiftRow(idx: usize, amount: i32) void {
     }
 }
 
+var block_size: i32 = 0;
+var padding: i32 = 0;
+
+fn indexToWorldPos(pos: u8) i32 {
+    return pos * block_size + (block_size >> 1);
+}
+
+fn renderWiresForDirectionWithSelectedIndex(direction: Direction, idx: usize, is_active: bool) void {
+    const wires = directionToWires(direction);
+    switch (direction) {
+        .Vertical => {
+            for (wires, 0..) |pos, loc| {
+                const coord = indexToWorldPos(pos);
+                rl.drawLine(
+                    coord,
+                    0,
+                    coord,
+                    rl.getRenderHeight(),
+                    if (is_active and loc == idx) rl.Color.red else rl.Color.gray,
+                );
+            }
+        },
+        .DiagonalUp => {
+            for (wires, 0..) |pos, loc| {
+                const coord = indexToWorldPos(pos);
+                rl.drawLine(
+                    0,
+                    coord,
+                    coord,
+                    0,
+                    if (is_active and loc == idx) rl.Color.red else rl.Color.gray,
+                );
+            }
+        },
+        .Horizontal => {
+            for (wires, 0..) |pos, loc| {
+                const coord = indexToWorldPos(pos);
+                rl.drawLine(
+                    0,
+                    coord,
+                    rl.getRenderWidth(),
+                    coord,
+                    if (is_active and loc == idx) rl.Color.red else rl.Color.gray,
+                );
+            }
+        },
+        .DiagonalDown => {
+            for (wires, 0..) |pos, loc| {
+                const coord = indexToWorldPos(pos);
+                rl.drawLine(
+                    coord,
+                    0,
+                    0,
+                    coord,
+                    if (is_active and loc == idx) rl.Color.red else rl.Color.gray,
+                );
+            }
+        },
+    }
+}
+
+fn directionToWires(dir: Direction) []const u8 {
+    return switch (dir) {
+        .Vertical => Level.vertical_wires,
+        .Horizontal => Level.horizontal_wires,
+        .DiagonalDown => Level.diag_down_wires,
+        .DiagonalUp => Level.diag_up_wires,
+    };
+}
+
 pub fn render() void {
-    const blockSize: i32 = @divTrunc(rl.getScreenHeight(), @as(i32, @intCast(Level.state.len)));
+    block_size = @divTrunc(rl.getScreenHeight(), @as(i32, @intCast(Level.state.len)));
+    padding = block_size >> 3;
     // rl.drawRectangle(0, 0, 128, 128, rl.Color.red);
 
     if (rl.isKeyPressed(rl.KeyboardKey.space)) {
         cursorState = @enumFromInt(@intFromEnum(cursorState) +% 1);
+        selectedIndex = 0;
     }
 
     switch (cursorState) {
-        .Horizontal => {
-            if (rl.isKeyPressed(rl.KeyboardKey.down)) {
-                selectedIndex +%= 1;
-            }
-            if (rl.isKeyPressed(rl.KeyboardKey.up)) {
-                selectedIndex -%= 1;
-            }
-
-            selectedIndex = @mod(selectedIndex, Level.state.len);
-
-            if (rl.isKeyPressed(rl.KeyboardKey.right)) {
-                shiftRow(selectedIndex, 1);
-            }
-            if (rl.isKeyPressed(rl.KeyboardKey.left)) {
-                shiftRow(selectedIndex, -1);
-            }
-
-            const yVal: f32 = @floatFromInt(@as(i32, @intCast(selectedIndex)) * blockSize);
-            rl.drawLineEx(
-                rl.Vector2.init(0, yVal),
-                rl.Vector2.init(@as(f32, @floatFromInt(rl.getRenderWidth())), yVal),
-                cursorThickness,
-                rl.colorAlpha(rl.Color.blue, 0.5),
-            );
-            std.debug.print("Horizontal: {}\n", .{yVal});
-        },
         .Vertical => {
-            if (rl.isKeyPressed(rl.KeyboardKey.right)) {
+            if (rl.isKeyPressed(.right)) {
                 selectedIndex +%= 1;
             }
-            if (rl.isKeyPressed(rl.KeyboardKey.left)) {
+            if (rl.isKeyPressed(.left)) {
                 selectedIndex -%= 1;
             }
-            selectedIndex = @mod(selectedIndex, Level.state.len);
+            selectedIndex = @mod(selectedIndex, Level.vertical_wires.len);
 
-            if (rl.isKeyPressed(rl.KeyboardKey.down)) {
-                shiftColumn(selectedIndex, 1);
+            if (rl.isKeyPressed(.up)) {
+                shiftColumn(Level.vertical_wires[selectedIndex], -1);
             }
-            if (rl.isKeyPressed(rl.KeyboardKey.up)) {
-                shiftColumn(selectedIndex, -1);
+            if (rl.isKeyPressed(.down)) {
+                shiftColumn(Level.vertical_wires[selectedIndex], 1);
             }
-
-            const yVal = (@as(i32, @intCast(selectedIndex)) * blockSize) + (blockSize >> 1);
-            std.debug.print("{}\n", .{yVal});
-            // rl.drawLineEx(
-            //     rl.Vector2.init(yVal, 0),
-            //     rl.Vector2.init(yVal, @as(f32, @floatFromInt(rl.getRenderWidth()))),
-            //     cursorThickness,
-            //     rl.colorAlpha(rl.Color.blue, 0.5),
-            // );
         },
         .DiagonalUp => {},
-        .DiagonalDown => {
-            if (rl.isKeyPressed(rl.KeyboardKey.down)) {
+        .Horizontal => {
+            if (rl.isKeyPressed(.down)) {
                 selectedIndex +%= 1;
             }
-            if (rl.isKeyPressed(rl.KeyboardKey.up)) {
+            if (rl.isKeyPressed(.up)) {
                 selectedIndex -%= 1;
             }
-            selectedIndex = @mod(selectedIndex, Level.state.len);
 
-            if (rl.isKeyPressed(rl.KeyboardKey.right)) {
-                shiftDiagDown(selectedIndex, 1);
+            selectedIndex = @mod(selectedIndex, Level.horizontal_wires.len);
+
+            if (rl.isKeyPressed(.right)) {
+                shiftRow(Level.horizontal_wires[selectedIndex], 1);
             }
-            if (rl.isKeyPressed(rl.KeyboardKey.left)) {
-                shiftDiagDown(selectedIndex, -1);
+            if (rl.isKeyPressed(.left)) {
+                shiftRow(Level.horizontal_wires[selectedIndex], -1);
             }
-            rl.drawRectanglePro(
-                rl.Rectangle.init(
-                    0,
-                    @as(f32, @floatFromInt(selectedIndex)) * @as(f32, @floatFromInt(blockSize)) - 4,
-                    @as(f32, (@floatFromInt(blockSize - 16))) * std.math.sqrt2,
-                    @as(f32, @floatFromInt(rl.getScreenHeight())) * @sqrt(2.0),
-                ),
-                rl.Vector2.zero(),
-                -45,
-                rl.Color.pink,
-            );
         },
+        .DiagonalDown => {},
     }
+    renderWiresForDirectionWithSelectedIndex(.Vertical, selectedIndex, cursorState == .Vertical);
+    renderWiresForDirectionWithSelectedIndex(.Horizontal, selectedIndex, cursorState == .Horizontal);
 
     // render pieces
     for (Level.state, 0..) |row, e| {
         for (row, 0..) |pieceMaybe, z| {
             if (pieceMaybe) |piece| {
                 rl.drawRectangle(
-                    @as(i32, @intCast(z)) * blockSize,
-                    @as(i32, @intCast(e)) * blockSize,
-                    blockSize - 16,
-                    blockSize - 16,
+                    (@as(i32, @intCast(z)) * block_size) + padding,
+                    (@as(i32, @intCast(e)) * block_size) + padding,
+                    block_size - (2 * padding),
+                    block_size - (2 * padding),
                     if (piece.marked) rl.Color.red else rl.Color.light_gray,
                 );
             }

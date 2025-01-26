@@ -4,10 +4,10 @@ pub const PuzzlePiece = struct { marked: bool };
 
 // u4 used cuz 16 possible values
 pub const LevelData = struct {
-    horizontal_wires: []const u4,
-    vertical_wires: []const u4,
-    diag_up_wires: []const u4,
-    diag_down_wires: []const u4,
+    horizontal_wires: []const u8,
+    vertical_wires: []const u8,
+    diag_up_wires: []const u8,
+    diag_down_wires: []const u8,
     state: [15][15]?PuzzlePiece,
     target_state: [15][15]?PuzzlePiece,
 };
