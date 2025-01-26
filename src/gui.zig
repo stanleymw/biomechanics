@@ -139,22 +139,17 @@ pub const ScrollingTextView = struct {
             @as(i32, @intFromFloat(self.bounds.height)),
         );
 
-        var current_y: f32 = self.bounds.y + self.scroll.y;
+        const current_y: f32 = self.bounds.y + self.scroll.y;
 
         // Render each line
-
-        var iter = std.mem.splitScalar(u8, self.text, '\n');
-        while (iter.next()) |line| {
-            rl.drawTextEx(
-                self.font,
-                @ptrCast(line),
-                rl.Vector2.init(self.bounds.x + 4, current_y),
-                @as(f32, @floatFromInt(self.font_size)),
-                1.0,
-                self.text_color,
-            );
-            current_y += @as(f32, @floatFromInt(self.font_size)) + 5;
-        }
+        rl.drawTextEx(
+            self.font,
+            @ptrCast(self.text),
+            rl.Vector2.init(self.bounds.x + 4, current_y),
+            @floatFromInt(self.font_size),
+            1.0,
+            self.text_color,
+        );
 
         rl.endScissorMode();
     }
