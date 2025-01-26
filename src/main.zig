@@ -126,8 +126,9 @@ pub fn main() anyerror!void {
     // runtime data
     var mousePos = rl.Vector2.init(0, 0);
     var pois = [_]PoiPin{
-        PoiPin.init(.SolarPanels, 0.5, 0.5, false),
-        PoiPin.init(.Nuclear, 0.75, 0.2, true),
+        PoiPin.init(.SolarPanels, 0.75, 0.45, false),
+        PoiPin.init(.Nuclear, 0.60, 0.65, true),
+        PoiPin.init(.CarbonCapture, 0.44, 0.37, true),
     };
 
     const info_anchor = rl.Vector2.init(190, 200);

@@ -2,7 +2,7 @@ const rl = @import("raylib");
 
 pub const Screen = union(enum) { MainMenu, Globe, Play: Place, LocationInfo: Location, Info };
 
-pub const Location = enum(u4) { SolarPanels, CarbonCapture, Nuclear, Desalination };
+pub const Location = enum(u4) { SolarPanels, CarbonCapture, Nuclear };
 pub const Place = struct {
     location: Location,
     level: u3,
