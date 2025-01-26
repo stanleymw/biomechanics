@@ -305,7 +305,7 @@ fn hasWon() bool {
     return true;
 }
 
-pub fn render() void {
+pub fn loop() bool {
     block_size = @divTrunc(rl.getRenderHeight(), @as(i32, @intCast(Level.state.len)));
     padding = block_size >> 3;
     // rl.drawRectangle(0, 0, 128, 128, rl.Color.red);
@@ -415,6 +415,14 @@ pub fn render() void {
         rl.drawText("Target State", 0, 0, 48, rl.Color.white);
     }
     if (hasWon()) {
-        rl.drawText("Won!", 0, 60, 48, rl.Color.white);
+        if (rg.guiMessageBox(
+            .{ .height = 256, .width = 512, .x = @floatFromInt(rl.getRenderWidth() >> 1), .y = @floatFromInt(rl.getRenderHeight() >> 1) },
+            "Level Complete",
+            "Component Successfully Repaired",
+            "Continue",
+        ) >= 0) {
+            return true;
+        }
     }
+    return false;
 }

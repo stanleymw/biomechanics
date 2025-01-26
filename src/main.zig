@@ -2,6 +2,8 @@ const rl = @import("raylib");
 const rg = @import("raygui");
 const std = @import("std");
 
+const location_info = @import("location_info.zig");
+
 const fonts = @import("fonts.zig");
 const game = @import("game.zig");
 const gui = @import("gui.zig");
@@ -27,9 +29,8 @@ const PoiPin = struct {
     fps: u9 = 24,
     frameRect: rl.Rectangle,
 
-    const Self = @This();
-    fn init(location: types.Location, x: f32, y: f32, isLocked: bool) Self {
-        return Self{
+    fn init(location: types.Location, x: f32, y: f32, isLocked: bool) PoiPin {
+        return PoiPin{
             .x = x,
             .y = y,
             .isLocked = isLocked,
@@ -40,7 +41,7 @@ const PoiPin = struct {
     fn calculateClickBounds(size: f32, x: f32, y: f32) rl.Rectangle {
         return rl.Rectangle.init(x - size / 2, y - size / 2, size, size);
     }
-    fn render(self: *Self, mPos: rl.Vector2) bool {
+    fn render(self: *PoiPin, mPos: rl.Vector2) bool {
         var pressed = false;
         if (!self.isLocked and !self.isCompleted) {
             self.frameCounter += 1;
@@ -125,11 +126,6 @@ pub fn main() anyerror!void {
 
     // runtime data
     var mousePos = rl.Vector2.init(0, 0);
-    var pois = [_]PoiPin{
-        PoiPin.init(.SolarPanels, 0.75, 0.45, false),
-        PoiPin.init(.Nuclear, 0.60, 0.65, true),
-        PoiPin.init(.CarbonCapture, 0.44, 0.37, true),
-    };
 
     const info_anchor = rl.Vector2.init(190, 200);
     var text_view = gui.ScrollingTextView.init(
@@ -140,6 +136,12 @@ pub fn main() anyerror!void {
         "",
         mainFont,
     );
+
+    var pois = [_]PoiPin{
+        PoiPin.init(.SolarPanels, 0.75, 0.45, false),
+        PoiPin.init(.Nuclear, 0.60, 0.65, true),
+        PoiPin.init(.CarbonCapture, 0.44, 0.37, true),
+    };
 
     // Main game loop
     while (!rl.windowShouldClose()) {
@@ -169,10 +171,10 @@ pub fn main() anyerror!void {
                     gui.drawTextureCentered(8.435, 0, spaceBg);
                     gui.drawTextureCentered(8.0, 0, globeTexture);
                     var location: ?types.Location = null;
-                    for (0..pois.len) |idx| {
-                        if (pois[idx].render(mousePos)) {
-                            location = pois[idx].location;
-                            pois[idx].isCompleted = true;
+                    for (&pois) |*poi| {
+                        if (poi.render(mousePos)) {
+                            location = poi.location;
+                            poi.isCompleted = true;
                         }
                     }
                     if (location != null) {
@@ -180,14 +182,15 @@ pub fn main() anyerror!void {
                     }
                 },
                 .Play => {
-                    game.render();
+                    if (game.loop()) {
+                        currentScreen = types.Screen{ .LocationInfo = .SolarPanels };
+                    }
                 },
                 .Info => {
                     currentScreen = .Globe;
                 },
                 .LocationInfo => |*location| {
-                    const info = @import("location_info.zig");
-                    const text = info.locationInfoText[@as(u4, @intFromEnum(location.*))];
+                    const text = location_info.locationInfoText[@as(u4, @intFromEnum(location.*))];
                     const anchor = rl.Vector2.init(190, 200);
                     rl.drawTextEx(
                         mainFont,
