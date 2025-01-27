@@ -2,7 +2,10 @@ const std = @import("std");
 const rl = @import("raylib");
 const rg = @import("raygui");
 
+const types = @import("types.zig");
+const consts = @import("consts.zig");
 const utils = @import("utils.zig");
+const assets = @import("assets.zig");
 
 pub fn imgBtn(
     scaleFactor: f32,
@@ -92,7 +95,7 @@ pub const ScrollingTextView = struct {
             .content_height = height,
             .scroll = rl.Vector2.zero(),
             .view = rl.Rectangle.init(0, 0, 0, 0),
-            .font_size = 30,
+            .font_size = 35,
             .text_color = rl.Color.black,
             .background_color = rl.Color.ray_white,
             .text = initial_text,
@@ -152,5 +155,60 @@ pub const ScrollingTextView = struct {
         );
 
         rl.endScissorMode();
+    }
+};
+
+pub const PoiPin = struct {
+    x: f32,
+    y: f32,
+    isLocked: bool = true,
+    isCompleted: bool = false,
+    location: types.Location,
+    frameCounter: u16 = 0,
+    currentFrame: u16 = 0,
+    fps: u9 = 24,
+    frameRect: rl.Rectangle,
+
+    pub fn init(location: types.Location, x: f32, y: f32, isLocked: bool) PoiPin {
+        return PoiPin{
+            .x = x,
+            .y = y,
+            .isLocked = isLocked,
+            .location = location,
+            .frameRect = rl.Rectangle.init(0, 0, 32, 32),
+        };
+    }
+    fn calculateClickBounds(size: f32, x: f32, y: f32) rl.Rectangle {
+        return rl.Rectangle.init(x - size / 2, y - size / 2, size, size);
+    }
+    pub fn render(self: *PoiPin, mPos: rl.Vector2) bool {
+        var pressed = false;
+        if (!self.isLocked and !self.isCompleted) {
+            self.frameCounter += 1;
+
+            if (self.frameCounter >= (consts.target_fps / self.fps)) {
+                self.frameCounter = 0;
+                self.currentFrame += 1;
+
+                if (self.currentFrame > 21) self.currentFrame = 0;
+
+                self.frameRect.x = @as(f32, @floatFromInt(self.currentFrame)) * 32;
+            }
+        } else self.currentFrame = 0;
+
+        const scaledPoint = utils.renderSize().multiply(rl.Vector2.init(self.x, self.y));
+
+        if (self.isLocked) {
+            drawTextureCenteredAtPoint(4.0, 0.0, scaledPoint, assets.poiPinLockedTex.getOrLoad());
+        } else if (self.isCompleted) {
+            drawTextureCenteredAtPoint(4.0, 0.0, scaledPoint, assets.poiPinCompletedTex.getOrLoad());
+        } else if (rl.checkCollisionPointRec(mPos, calculateClickBounds(100, scaledPoint.x, scaledPoint.y))) {
+            pressed = rl.isMouseButtonPressed(.left);
+            drawTextureProCenteredAtPoint(4.0, 0.0, scaledPoint, assets.poiPinHoverTex.getOrLoad(), self.frameRect);
+        } else {
+            drawTextureProCenteredAtPoint(4.0, 0.0, scaledPoint, assets.poiPinTex.getOrLoad(), self.frameRect);
+        }
+
+        return pressed;
     }
 };

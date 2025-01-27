@@ -12,26 +12,15 @@ const Direction = enum(u2) { Vertical, DiagonalUp, Horizontal, DiagonalDown };
 var cursorState: Direction = .Vertical;
 
 var Level: types.LevelData = undefined;
+var level_loaded = false;
 
-pub fn createWorld() void {
-    for (0..N * N) |i| {
-        Level.state[6 + @mod(i, N)][6 + @divFloor(i, N)] = types.PuzzlePiece{ .marking = 0 };
+pub fn levelUnloaded() bool {
+    return !level_loaded;
+}
 
-        // rl.drawRectangle((@mod(x, N)) * 160, @divFloor(x, N) * 160, 128, 128, rl.colorFromHSV(@as(f32, @floatFromInt((x + 1))) * 360.0 / (N * N), 1, 0.5));
-    }
-    Level.state[6][7].?.marking = 1;
-
-    for (0..N * N) |i| {
-        Level.target_state[6 + @mod(i, N)][6 + @divFloor(i, N)] = types.PuzzlePiece{ .marking = 0 };
-
-        // rl.drawRectangle((@mod(x, N)) * 160, @divFloor(x, N) * 160, 128, 128, rl.colorFromHSV(@as(f32, @floatFromInt((x + 1))) * 360.0 / (N * N), 1, 0.5));
-    }
-    Level.target_state[8][6].?.marking = 1;
-
-    Level.horizontal_wires = &[_]u8{ 6, 7, 8 };
-    Level.vertical_wires = &[_]u8{ 6, 7, 8 };
-    Level.diag_up_wires = &[_]u8{};
-    Level.diag_down_wires = &[_]u8{};
+pub fn loadLevel(level: types.LevelData) void {
+    level_loaded = true;
+    Level = level;
 }
 
 fn isSameSizeAsTargetStateWire(typ: Direction, idx: usize) bool {
@@ -416,7 +405,12 @@ pub fn loop() bool {
     }
     if (hasWon()) {
         if (rg.guiMessageBox(
-            .{ .height = 256, .width = 512, .x = @floatFromInt(rl.getRenderWidth() >> 1), .y = @floatFromInt(rl.getRenderHeight() >> 1) },
+            .{
+                .height = 256,
+                .width = 512,
+                .x = @as(f32, @floatFromInt(rl.getRenderWidth() >> 1)) - 256,
+                .y = @as(f32, @floatFromInt(rl.getRenderHeight() >> 1)) - 128,
+            },
             "Level Complete",
             "Component Successfully Repaired",
             "Continue",
