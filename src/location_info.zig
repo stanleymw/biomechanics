@@ -9,6 +9,23 @@ pub const location_data = [_]LocationData{
         .image_name = "",
         .levels = &[_]LevelData{
             LevelData{
+                .vertical_wires = &[_]u8{ 6, 7 },
+                .horizontal_wires = &[_]u8{ 6, 7 },
+                .diag_up_wires = &[_]u8{},
+                .diag_down_wires = &[_]u8{},
+                .state = StateBuilder
+                    .empty()
+                    .box(6, 6, 8, 8, 0)
+                    .point(7, 6, 1)
+                    .build(),
+                .target_state = StateBuilder
+                    .empty()
+                    .box(6, 6, 8, 8, 0)
+                    .point(6, 6, 1)
+                    .build(),
+                .name = "PV Cells",
+            },
+            LevelData{
                 .vertical_wires = &[_]u8{ 6, 7, 8 },
                 .horizontal_wires = &[_]u8{ 6, 7, 8 },
                 .diag_up_wires = &[_]u8{},
@@ -23,6 +40,27 @@ pub const location_data = [_]LocationData{
                     .box(6, 6, 9, 9, 0)
                     .point(6, 8, 1)
                     .build(),
+                .name = "Frame",
+            },
+            LevelData{
+                .vertical_wires = &[_]u8{ 6, 7, 8 },
+                .horizontal_wires = &[_]u8{ 6, 7, 8 },
+                .diag_up_wires = &[_]u8{},
+                .diag_down_wires = &[_]u8{},
+                .state = StateBuilder
+                    .empty()
+                    .hLine(6, 9, 6, 0)
+                    .hLine(6, 9, 9, 0)
+                    .vLine(9, 6, 9, 0)
+                    .vLine(6, 6, 9, 0)
+                    .point(7, 6, 1)
+                    .build(),
+                .target_state = StateBuilder
+                    .empty()
+                    .box(6, 6, 9, 9, 0)
+                    .point(6, 8, 1)
+                    .build(),
+                .name = "Glass",
             },
         },
         .info =

@@ -144,17 +144,20 @@ pub fn main() anyerror!void {
                     text_view.setText(text);
                     text_view.render();
 
-                    if (rg.guiButton(
-                        rl.Rectangle.init(info_anchor.x, info_anchor.y + 600, 500, 100),
-                        "continue",
-                    ) == 1) {
-                        currentScreen = .{
-                            .Play = .{
-                                .level = 0,
-                                .location = location.*,
-                            },
-                        };
+                    for (location.getInfo().levels, 0..) |lev, ix| {
+                        if (rg.guiButton(
+                            rl.Rectangle.init(info_anchor.x, info_anchor.y + 600 + @as(f32, @floatFromInt(75 * ix)), 500, 50),
+                            lev.name,
+                        ) == 1) {
+                            currentScreen = .{
+                                .Play = .{
+                                    .level = @intCast(ix),
+                                    .location = location.*,
+                                },
+                            };
+                        }
                     }
+
                     // RENDER IMAGE OF MACHINE
                 },
                 .Ending => {
