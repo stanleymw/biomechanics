@@ -28,6 +28,7 @@ pub const LevelData = struct {
     diag_down_wires: []const u8,
     state: LevelState,
     target_state: LevelState,
+    name: [:0]const u8,
 };
 
 pub const LocationData = struct {
@@ -40,36 +41,35 @@ pub const LocationData = struct {
 
 pub const StateBuilder = struct {
     state: LevelState,
-    const Self = @This();
-    pub fn empty() Self {
+    pub fn empty() StateBuilder {
         return fromState(.{.{null} ** 15} ** 15);
     }
-    fn fromState(state: LevelState) Self {
+    fn fromState(state: LevelState) StateBuilder {
         return .{ .state = state };
     }
-    pub fn build(self: Self) LevelState {
+    pub fn build(self: StateBuilder) LevelState {
         return self.state;
     }
-    pub fn point(self: Self, x: u8, y: u8, marking: u8) Self {
+    pub fn point(self: StateBuilder, x: u8, y: u8, marking: u8) StateBuilder {
         var state = self.state;
         state[y][x] = .{ .marking = marking };
         return fromState(state);
     }
-    pub fn hLine(self: Self, x1: u8, x2: u8, y: u8, marking: u8) Self {
+    pub fn hLine(self: StateBuilder, x1: u8, x2: u8, y: u8, marking: u8) StateBuilder {
         var state = self.state;
         for (x1..x2) |x| {
             state[y][x] = .{ .marking = marking };
         }
-        return fromState(self);
+        return fromState(state);
     }
-    pub fn vLine(self: Self, x: u8, y1: u8, y2: u8, marking: u8) Self {
+    pub fn vLine(self: StateBuilder, x: u8, y1: u8, y2: u8, marking: u8) StateBuilder {
         var state = self.state;
         for (y1..y2) |y| {
             state[y][x] = .{ .marking = marking };
         }
-        return fromState(self);
+        return fromState(state);
     }
-    pub fn box(self: Self, x1: u8, y1: u8, x2: u8, y2: u8, marking: u8) Self {
+    pub fn box(self: StateBuilder, x1: u8, y1: u8, x2: u8, y2: u8, marking: u8) StateBuilder {
         var state = self.state;
         for (x1..x2) |x| {
             for (y1..y2) |y| {
