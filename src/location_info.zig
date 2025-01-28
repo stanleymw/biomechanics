@@ -17,18 +17,20 @@ pub const location_data = [_]LocationData{
                 .state = StateBuilder
                     .empty()
                     .box(6, 6, 8, 8, 0)
-                    .point(7, 6, 1)
+                    .point(6, 6, 1)
+                    .point(7, 7, 2)
                     .build(),
                 .target_state = StateBuilder
                     .empty()
                     .box(6, 6, 8, 8, 0)
                     .point(6, 6, 1)
+                    .point(6, 7, 2)
                     .build(),
                 .name = "PV Cells",
                 .markingPictures = &[_]*assets.Asset{
-                    &assets.node0,
-                    &assets.node1,
-                    &assets.node2,
+                    &assets.standard_node,
+                    &assets.n_type_silicon_node,
+                    &assets.p_type_silicon_node,
                 },
             },
             LevelData{
@@ -48,14 +50,13 @@ pub const location_data = [_]LocationData{
                     .build(),
                 .name = "Frame",
                 .markingPictures = &[_]*assets.Asset{
-                    &assets.node0,
-                    &assets.node1,
-                    &assets.node2,
+                    &assets.standard_node,
+                    &assets.screw_node,
                 },
             },
             LevelData{
-                .vertical_wires = &[_]u8{ 6, 7, 8 },
-                .horizontal_wires = &[_]u8{ 6, 7, 8 },
+                .vertical_wires = &[_]u8{ 6, 8 },
+                .horizontal_wires = &[_]u8{ 6, 8 },
                 .diag_up_wires = &[_]u8{},
                 .diag_down_wires = &[_]u8{},
                 .state = StateBuilder
@@ -78,9 +79,9 @@ pub const location_data = [_]LocationData{
                     .build(),
                 .name = "Glass",
                 .markingPictures = &[_]*assets.Asset{
-                    &assets.node0,
-                    &assets.node1,
-                    &assets.node2,
+                    &assets.standard_node,
+                    &assets.sealant_node,
+                    &assets.screw_node,
                 },
             },
         },

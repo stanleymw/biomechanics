@@ -408,7 +408,7 @@ pub fn loop() bool {
                     markingToTexture(piece.marking),
                     rl.Vector2.init(@floatFromInt(x), @floatFromInt(y)),
                     0.0,
-                    1.0,
+                    2.0,
                     rl.Color.white,
                 );
             }

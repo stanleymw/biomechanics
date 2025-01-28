@@ -34,6 +34,9 @@ pub var playBtn = Asset.init("resources/play-btn.png");
 pub var playBtnHover = Asset.init("resources/play-btn-hover.png");
 pub var playBtnPress = Asset.init("resources/play-btn-press.png");
 
-pub var node0 = Asset.init("resources/POI/SolarPanel/0/Nodes/0.png");
-pub var node1 = Asset.init("resources/POI/SolarPanel/0/Nodes/1.png");
-pub var node2 = Asset.init("resources/POI/SolarPanel/0/Nodes/2.png");
+pub var standard_node = Asset.init("resources/POI/standard-node.png");
+
+pub var n_type_silicon_node = Asset.init("resources/POI/SolarPanel/Nodes/0.png");
+pub var p_type_silicon_node = Asset.init("resources/POI/SolarPanel/Nodes/1.png");
+pub var sealant_node = Asset.init("resources/POI/SolarPanel/Nodes/2.png");
+pub var screw_node = Asset.init("resources/POI/SolarPanel/Nodes/3.png");
