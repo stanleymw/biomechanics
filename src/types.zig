@@ -1,7 +1,15 @@
 const rl = @import("raylib");
 const location_info = @import("location_info.zig");
 
-pub const Screen = union(enum) { MainMenu, Globe, Play: Place, LocationInfo: Location, Info, Ending };
+pub const Screen = union(enum) {
+    MainMenu,
+    Globe,
+    Play: Place,
+    LocationInfo: Location,
+    ComponentSelector: Location,
+    Info,
+    Ending,
+};
 
 pub const Location = enum(u2) {
     SolarPanels,

@@ -115,11 +115,12 @@ pub fn main() anyerror!void {
                             place.level += 1;
                             game.loadLevel(location.levels[place.level]);
                         } else {
-                            if (@intFromEnum(place.location) < @typeInfo(types.Location).Enum.decls.len - 1) {
-                                currentScreen = types.Screen{
-                                    .LocationInfo = @enumFromInt(@intFromEnum(place.location) + 1),
-                                };
-                            } else currentScreen = .Ending;
+                            currentScreen = .Globe;
+                            // if (@intFromEnum(place.location) < @typeInfo(types.Location).Enum.decls.len - 1) {
+                            //     currentScreen = types.Screen{
+                            //         .LocationInfo = @enumFromInt(@intFromEnum(place.location) + 1),
+                            //     };
+                            // } else currentScreen = .Ending;
                         }
                     }
                 },

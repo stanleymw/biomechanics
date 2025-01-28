@@ -27,6 +27,9 @@ pub fn build(b: *std.Build) !void {
         //this lets your program access files like "resources/my-image.png":
         link_step.addArg("--embed-file");
         link_step.addArg("resources/");
+        // asyncify off b/c of animation
+        //link_step.addArg("-s");
+        //link_step.addArg("ASYNCIFY");
         link_step.addArg("--shell-file");
         link_step.addArg("web/template.html");
 
