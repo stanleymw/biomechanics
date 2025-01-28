@@ -3,6 +3,7 @@ const rg = @import("raygui");
 const std = @import("std");
 
 const types = @import("types.zig");
+const gui = @import("gui.zig");
 
 const N = 3;
 
@@ -272,6 +273,10 @@ fn markingToColor(mark: u8) rl.Color {
     };
 }
 
+fn markingToTexture(mark: u8) rl.Texture2D {
+    return Level.markingPictures[mark].getOrLoad();
+}
+
 fn hasWon() bool {
     for (Level.target_state, 0..) |row, e| {
         for (row, 0..) |pieceMaybe, z| {
@@ -389,12 +394,22 @@ pub fn loop() bool {
     for (if (rendering_target) Level.target_state else Level.state, 0..) |row, e| {
         for (row, 0..) |pieceMaybe, z| {
             if (pieceMaybe) |piece| {
-                rl.drawRectangle(
-                    (@as(i32, @intCast(z)) * block_size) + padding,
-                    (@as(i32, @intCast(e)) * block_size) + padding,
-                    block_size - (2 * padding),
-                    block_size - (2 * padding),
-                    markingToColor(piece.marking),
+                // rl.drawRectangle(
+                //     (@as(i32, @intCast(z)) * block_size) + padding,
+                //     (@as(i32, @intCast(e)) * block_size) + padding,
+                //     block_size - (2 * padding),
+                //     block_size - (2 * padding),
+                //     markingToColor(piece.marking),
+                // );
+
+                const x = (@as(i32, @intCast(z)) * block_size) + padding;
+                const y = (@as(i32, @intCast(e)) * block_size) + padding;
+                rl.drawTextureEx(
+                    markingToTexture(piece.marking),
+                    rl.Vector2.init(@floatFromInt(x), @floatFromInt(y)),
+                    0.0,
+                    1.0,
+                    rl.Color.white,
                 );
             }
         }

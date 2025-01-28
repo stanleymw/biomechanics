@@ -1,31 +1,39 @@
 const rl = @import("raylib");
 
-pub fn Asset(comptime file_path: [*:0]const u8) type {
-    return struct {
-        texture: ?rl.Texture = null,
-        const Self = @This();
-        pub fn getOrLoad(self: *Self) rl.Texture2D {
-            if (self.texture == null)
-                self.texture = rl.Texture.fromImage(rl.Image.init(file_path));
-            return self.texture.?;
+pub const Asset = struct {
+    texture: ?rl.Texture = null,
+    file_path: [*:0]const u8,
+
+    pub fn init(comptime fp: [*:0]const u8) Asset {
+        return Asset{ .file_path = fp };
+    }
+
+    pub fn getOrLoad(self: *Asset) rl.Texture2D {
+        if (self.texture == null)
+            self.texture = rl.Texture.fromImage(rl.Image.init(self.file_path));
+        return self.texture.?;
+    }
+
+    pub fn deinit(self: *Asset) void {
+        if (self.texture) |x| {
+            x.unload();
         }
-        pub fn deinit(self: *Self) void {
-            if (self.texture) |x| {
-                x.unload();
-            }
-        }
-    };
-}
+    }
+};
 
-pub var poiPinTex = Asset("resources/poi-ani.png"){};
-pub var poiPinLockedTex = Asset("resources/locked-pin.png"){};
-pub var poiPinHoverTex = Asset("resources/poi-hover-ani.png"){};
-pub var poiPinCompletedTex = Asset("resources/checked-pin.png"){};
+pub var poiPinTex = Asset.init("resources/poi-ani.png");
+pub var poiPinLockedTex = Asset.init("resources/locked-pin.png");
+pub var poiPinHoverTex = Asset.init("resources/poi-hover-ani.png");
+pub var poiPinCompletedTex = Asset.init("resources/checked-pin.png");
 
-pub var globeTexture = Asset("resources/globe.png"){};
-pub var gameLogo = Asset("resources/logo.png"){};
-pub var spaceBg = Asset("resources/space.png"){};
+pub var globeTexture = Asset.init("resources/globe.png");
+pub var gameLogo = Asset.init("resources/logo.png");
+pub var spaceBg = Asset.init("resources/space.png");
 
-pub var playBtn = Asset("resources/play-btn.png"){};
-pub var playBtnHover = Asset("resources/play-btn-hover.png"){};
-pub var playBtnPress = Asset("resources/play-btn-press.png"){};
+pub var playBtn = Asset.init("resources/play-btn.png");
+pub var playBtnHover = Asset.init("resources/play-btn-hover.png");
+pub var playBtnPress = Asset.init("resources/play-btn-press.png");
+
+pub var node0 = Asset.init("resources/POI/SolarPanel/0/Nodes/0.png");
+pub var node1 = Asset.init("resources/POI/SolarPanel/0/Nodes/1.png");
+pub var node2 = Asset.init("resources/POI/SolarPanel/0/Nodes/2.png");

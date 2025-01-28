@@ -1,12 +1,12 @@
 const rl = @import("raylib");
 const location_info = @import("location_info.zig");
+const assets = @import("assets.zig");
 
 pub const Screen = union(enum) {
     MainMenu,
     Globe,
     Play: Place,
     LocationInfo: Location,
-    ComponentSelector: Location,
     Info,
     Ending,
 };
@@ -37,6 +37,7 @@ pub const LevelData = struct {
     state: LevelState,
     target_state: LevelState,
     name: [:0]const u8,
+    markingPictures: []const *assets.Asset,
 };
 
 pub const LocationData = struct {

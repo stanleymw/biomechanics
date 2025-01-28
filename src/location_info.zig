@@ -2,6 +2,7 @@ const types = @import("types.zig");
 const LevelData = types.LevelData;
 const LocationData = types.LocationData;
 const StateBuilder = types.StateBuilder;
+const assets = @import("assets.zig");
 
 pub const location_data = [_]LocationData{
     LocationData{
@@ -24,6 +25,11 @@ pub const location_data = [_]LocationData{
                     .point(6, 6, 1)
                     .build(),
                 .name = "PV Cells",
+                .markingPictures = &[_]*assets.Asset{
+                    &assets.node0,
+                    &assets.node1,
+                    &assets.node2,
+                },
             },
             LevelData{
                 .vertical_wires = &[_]u8{ 6, 7, 8 },
@@ -41,6 +47,11 @@ pub const location_data = [_]LocationData{
                     .point(6, 8, 1)
                     .build(),
                 .name = "Frame",
+                .markingPictures = &[_]*assets.Asset{
+                    &assets.node0,
+                    &assets.node1,
+                    &assets.node2,
+                },
             },
             LevelData{
                 .vertical_wires = &[_]u8{ 6, 7, 8 },
@@ -50,17 +61,27 @@ pub const location_data = [_]LocationData{
                 .state = StateBuilder
                     .empty()
                     .hLine(6, 9, 6, 0)
-                    .hLine(6, 9, 9, 0)
-                    .vLine(9, 6, 9, 0)
+                    .hLine(6, 9, 8, 0)
+                    .vLine(8, 6, 9, 0)
                     .vLine(6, 6, 9, 0)
-                    .point(7, 6, 1)
+                    .point(8, 6, 1)
+                    .point(6, 8, 2)
                     .build(),
                 .target_state = StateBuilder
                     .empty()
-                    .box(6, 6, 9, 9, 0)
-                    .point(6, 8, 1)
+                    .hLine(6, 9, 6, 0)
+                    .hLine(6, 9, 8, 0)
+                    .vLine(8, 6, 9, 0)
+                    .vLine(6, 6, 9, 0)
+                    .point(6, 6, 2)
+                    .point(8, 8, 1)
                     .build(),
                 .name = "Glass",
+                .markingPictures = &[_]*assets.Asset{
+                    &assets.node0,
+                    &assets.node1,
+                    &assets.node2,
+                },
             },
         },
         .info =
