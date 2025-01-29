@@ -91,7 +91,9 @@ pub fn main() anyerror!void {
                                 location = poi.location;
                             },
                             .Hovered => {
-                                rl.drawText(@ptrCast(poi.location.getInfo().name), rl.getRenderWidth() >> 1, rl.getRenderHeight() >> 1, 32, rl.Color.white);
+                                const dat: [*:0]const u8 = @ptrCast(poi.location.getInfo().name);
+                                const bounds = rl.measureText(dat, fonts.Size.Medium);
+                                rl.drawText(dat, (@divTrunc(rl.getRenderWidth(), 2)) - (@divTrunc(bounds, 2)), rl.getRenderHeight() >> 1, 32, rl.Color.white);
                             },
                             else => {},
                             //poi.isCompleted = true;
