@@ -402,14 +402,24 @@ pub fn loop() bool {
                 //     markingToColor(piece.marking),
                 // );
 
-                const x = (@as(i32, @intCast(z)) * block_size) + padding;
-                const y = (@as(i32, @intCast(e)) * block_size) + padding;
-                rl.drawTextureEx(
-                    markingToTexture(piece.marking),
-                    rl.Vector2.init(@floatFromInt(x), @floatFromInt(y)),
-                    0.0,
+                // const x = (@as(i32, @intCast(z)) * block_size) + padding;
+                // const y = (@as(i32, @intCast(e)) * block_size) + padding;
+                // rl.drawTextureEx(
+                //     markingToTexture(piece.marking),
+                //     rl.Vector2.init(@floatFromInt(x), @floatFromInt(y)),
+                //     0.0,
+                //     2.0,
+                //     rl.Color.white,
+                // );
+                const block_size_f: f32 = @floatFromInt(block_size);
+                gui.drawTextureCenteredAtPoint(
                     2.0,
-                    rl.Color.white,
+                    0.0,
+                    rl.Vector2.init(
+                        @as(f32, @floatFromInt(z)) * block_size_f + block_size_f / 2,
+                        @as(f32, @floatFromInt(e)) * block_size_f + block_size_f / 2,
+                    ),
+                    markingToTexture(piece.marking),
                 );
             }
         }
