@@ -7,6 +7,8 @@ const consts = @import("consts.zig");
 const utils = @import("utils.zig");
 const assets = @import("assets.zig");
 
+const ButtonState = enum { Pressed, Hovered, Regular };
+
 pub fn imgBtn(
     scaleFactor: f32,
     pos: rl.Vector2,
@@ -181,7 +183,7 @@ pub const PoiPin = struct {
     fn calculateClickBounds(size: f32, x: f32, y: f32) rl.Rectangle {
         return rl.Rectangle.init(x - size / 2, y - size / 2, size, size);
     }
-    pub fn render(self: *PoiPin, mPos: rl.Vector2) bool {
+    pub fn render(self: *PoiPin, mPos: rl.Vector2) ButtonState {
         var pressed = false;
         if (!self.isLocked and !self.isCompleted) {
             self.frameCounter += 1;
@@ -205,10 +207,13 @@ pub const PoiPin = struct {
         } else if (rl.checkCollisionPointRec(mPos, calculateClickBounds(100, scaledPoint.x, scaledPoint.y))) {
             pressed = rl.isMouseButtonPressed(.left);
             drawTextureProCenteredAtPoint(4.0, 0.0, scaledPoint, assets.poiPinHoverTex.getOrLoad(), self.frameRect);
+            if (!pressed) {
+                return .Hovered;
+            }
         } else {
             drawTextureProCenteredAtPoint(4.0, 0.0, scaledPoint, assets.poiPinTex.getOrLoad(), self.frameRect);
         }
 
-        return pressed;
+        return if (pressed) .Pressed else .Regular;
     }
 };

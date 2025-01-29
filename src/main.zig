@@ -27,7 +27,7 @@ pub fn main() anyerror!void {
     defer rl.unloadFont(mainFont);
 
     rl.drawFPS(0, 0);
-    rl.setExitKey(.null);
+    // rl.setExitKey(.null);
     rl.setTargetFPS(240);
     rg.guiSetStyle(rg.GuiControl.default, rg.GuiDefaultProperty.text_size, fonts.Size.Medium);
 
@@ -86,8 +86,14 @@ pub fn main() anyerror!void {
                     gui.drawTextureCentered(8.0, 0, assets.globeTexture.getOrLoad());
                     var location: ?types.Location = null;
                     for (&pois) |*poi| {
-                        if (poi.render(mousePos)) {
-                            location = poi.location;
+                        switch (poi.render(mousePos)) {
+                            .Pressed => {
+                                location = poi.location;
+                            },
+                            .Hovered => {
+                                rl.drawText(@ptrCast(poi.location.getInfo().name), rl.getRenderWidth() >> 1, rl.getRenderHeight() >> 1, 32, rl.Color.white);
+                            },
+                            else => {},
                             //poi.isCompleted = true;
                         }
                     }
@@ -108,9 +114,13 @@ pub fn main() anyerror!void {
                             game.loadLevel(location.levels[place.level]);
                         } else {
                             currentScreen = .Globe;
-                            for (&pois) |*poi| {
+                            for (&pois, 0..) |*poi, idx| {
                                 if (poi.location == place.location) {
                                     poi.isCompleted = true;
+                                    if (idx + 1 < pois.len) {
+                                        pois[idx + 1].isLocked = false;
+                                    }
+
                                     break;
                                 }
                             }
