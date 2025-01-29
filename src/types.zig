@@ -7,6 +7,7 @@ pub const Screen = union(enum) {
     Globe,
     Play: Place,
     LocationInfo: Location,
+    ComponentInfo: Location,
     Info,
     Ending,
 };
@@ -37,13 +38,15 @@ pub const LevelData = struct {
     state: LevelState,
     target_state: LevelState,
     name: [:0]const u8,
-    markingPictures: []const *assets.Asset,
+    markingPictures: []const *assets.TAsset,
+    solved: bool = false,
+    locked: bool = true,
 };
 
 pub const LocationData = struct {
     name: []const u8,
     info: []const u8,
-    image_name: []const u8,
+    image_name: *assets.TAsset,
     levels: []const LevelData,
     //component_image_names: []const u8,
 };

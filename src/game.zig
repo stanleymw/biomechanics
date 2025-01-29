@@ -4,6 +4,8 @@ const std = @import("std");
 
 const types = @import("types.zig");
 const gui = @import("gui.zig");
+const utils = @import("utils.zig");
+const assets = @import("assets.zig");
 
 const N = 3;
 
@@ -394,23 +396,6 @@ pub fn loop() bool {
     for (if (rendering_target) Level.target_state else Level.state, 0..) |row, e| {
         for (row, 0..) |pieceMaybe, z| {
             if (pieceMaybe) |piece| {
-                // rl.drawRectangle(
-                //     (@as(i32, @intCast(z)) * block_size) + padding,
-                //     (@as(i32, @intCast(e)) * block_size) + padding,
-                //     block_size - (2 * padding),
-                //     block_size - (2 * padding),
-                //     markingToColor(piece.marking),
-                // );
-
-                // const x = (@as(i32, @intCast(z)) * block_size) + padding;
-                // const y = (@as(i32, @intCast(e)) * block_size) + padding;
-                // rl.drawTextureEx(
-                //     markingToTexture(piece.marking),
-                //     rl.Vector2.init(@floatFromInt(x), @floatFromInt(y)),
-                //     0.0,
-                //     2.0,
-                //     rl.Color.white,
-                // );
                 const block_size_f: f32 = @floatFromInt(block_size);
                 gui.drawTextureCenteredAtPoint(
                     2.0,
@@ -429,17 +414,14 @@ pub fn loop() bool {
         rl.drawText("Target State", 0, 0, 48, rl.Color.white);
     }
     if (hasWon()) {
-        if (rg.guiMessageBox(
-            .{
-                .height = 256,
-                .width = 512,
-                .x = @as(f32, @floatFromInt(rl.getRenderWidth() >> 1)) - 256,
-                .y = @as(f32, @floatFromInt(rl.getRenderHeight() >> 1)) - 128,
-            },
-            "Level Complete",
-            "Component Successfully Repaired",
-            "Continue",
-        ) >= 0) {
+        if (gui.imgBtn(
+            0.6,
+            utils.renderSize().scale(0.5),
+            assets.completedComponent.getOrLoad(),
+            null,
+            null,
+            rl.getMousePosition(),
+        )) {
             return true;
         }
     }

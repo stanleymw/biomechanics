@@ -34,16 +34,7 @@ pub fn main() anyerror!void {
     rg.guiSetFont(mainFont);
 
     // Textures unloading (assets are lazily loaded)
-    defer assets.globeTexture.deinit();
-    defer assets.gameLogo.deinit();
-    defer assets.spaceBg.deinit();
-    defer assets.playBtn.deinit();
-    defer assets.playBtnHover.deinit();
-    defer assets.playBtnPress.deinit();
-    defer assets.poiPinTex.deinit();
-    defer assets.poiPinLockedTex.deinit();
-    defer assets.poiPinHoverTex.deinit();
-    defer assets.poiPinCompletedTex.deinit();
+    defer assets.assetPool.deinitAll();
 
     // runtime data
     var currentScreen: types.Screen = .MainMenu;
@@ -97,7 +88,7 @@ pub fn main() anyerror!void {
                     for (&pois) |*poi| {
                         if (poi.render(mousePos)) {
                             location = poi.location;
-                            poi.isCompleted = true;
+                            //poi.isCompleted = true;
                         }
                     }
                     if (location != null) {
@@ -105,6 +96,7 @@ pub fn main() anyerror!void {
                     }
                 },
                 .Play => |*place| {
+                    gui.drawTextureCentered(0.8, 0, assets.playBg.getOrLoad());
                     const location = place.location.getInfo();
 
                     if (game.levelUnloaded())
@@ -116,11 +108,13 @@ pub fn main() anyerror!void {
                             game.loadLevel(location.levels[place.level]);
                         } else {
                             currentScreen = .Globe;
-                            // if (@intFromEnum(place.location) < @typeInfo(types.Location).Enum.decls.len - 1) {
-                            //     currentScreen = types.Screen{
-                            //         .LocationInfo = @enumFromInt(@intFromEnum(place.location) + 1),
-                            //     };
-                            // } else currentScreen = .Ending;
+                            for (&pois) |*poi| {
+                                if (poi.location == place.location) {
+                                    poi.isCompleted = true;
+                                    break;
+                                }
+                            }
+                            // TODO: display area completion
                         }
                     }
                 },
@@ -128,8 +122,15 @@ pub fn main() anyerror!void {
                     currentScreen = .Globe;
                 },
                 .LocationInfo => |*location| {
-                    const text = location.getInfo().info;
+                    const info = location.getInfo();
                     const anchor = rl.Vector2.init(190, 200);
+                    rl.drawTextureEx(
+                        info.image_name.getOrLoad(),
+                        anchor.add(rl.Vector2.init(0, 100)),
+                        0,
+                        0.5,
+                        rl.Color.white,
+                    );
                     rl.drawTextEx(
                         mainFont,
                         switch (location.*) {
@@ -142,8 +143,8 @@ pub fn main() anyerror!void {
                         0,
                         rl.Color.light_gray,
                     );
-                    text_view.setText(text);
-                    text_view.render();
+                    text_view.setText(info.info);
+                    //text_view.render();
 
                     for (location.getInfo().levels, 0..) |lev, ix| {
                         if (rg.guiButton(
@@ -161,6 +162,7 @@ pub fn main() anyerror!void {
 
                     // RENDER IMAGE OF MACHINE
                 },
+                .ComponentInfo => {}, //|*location| {},
                 .Ending => {
                     rl.drawTextEx(
                         mainFont,

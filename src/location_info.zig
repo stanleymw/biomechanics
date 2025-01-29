@@ -4,10 +4,10 @@ const LocationData = types.LocationData;
 const StateBuilder = types.StateBuilder;
 const assets = @import("assets.zig");
 
-pub const location_data = [_]LocationData{
+pub var location_data = [_]LocationData{
     LocationData{
         .name = "West Africa - Solar Panels",
-        .image_name = "",
+        .image_name = &assets.solarMachine,
         .levels = &[_]LevelData{
             LevelData{
                 .vertical_wires = &[_]u8{ 6, 7 },
@@ -27,11 +27,12 @@ pub const location_data = [_]LocationData{
                     .point(6, 7, 2)
                     .build(),
                 .name = "PV Cells",
-                .markingPictures = &[_]*assets.Asset{
+                .markingPictures = &[_]*assets.TAsset{
                     &assets.standard_node,
                     &assets.n_type_silicon_node,
                     &assets.p_type_silicon_node,
                 },
+                .locked = false,
             },
             LevelData{
                 .vertical_wires = &[_]u8{ 6, 7, 8 },
@@ -49,7 +50,7 @@ pub const location_data = [_]LocationData{
                     .point(6, 8, 1)
                     .build(),
                 .name = "Frame",
-                .markingPictures = &[_]*assets.Asset{
+                .markingPictures = &[_]*assets.TAsset{
                     &assets.standard_node,
                     &assets.screw_node,
                 },
@@ -78,7 +79,7 @@ pub const location_data = [_]LocationData{
                     .point(8, 8, 1)
                     .build(),
                 .name = "Glass",
-                .markingPictures = &[_]*assets.Asset{
+                .markingPictures = &[_]*assets.TAsset{
                     &assets.standard_node,
                     &assets.sealant_node,
                     &assets.screw_node,
@@ -125,13 +126,13 @@ pub const location_data = [_]LocationData{
     },
     LocationData{
         .name = "Eastern South America - Nuclear Power",
-        .image_name = "",
+        .image_name = &assets.nuclearMachine,
         .levels = &[_]LevelData{},
         .info = "placeholder info",
     },
     LocationData{
         .name = "Eastern North America - Carbon Capture",
-        .image_name = "carbon-capture-machine",
+        .image_name = &assets.carbonMachine,
         .info = "placeholder info",
         .levels = &[_]LevelData{},
     },

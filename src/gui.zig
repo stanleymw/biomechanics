@@ -11,8 +11,8 @@ pub fn imgBtn(
     scaleFactor: f32,
     pos: rl.Vector2,
     reg_texture: rl.Texture2D,
-    hov_texture: rl.Texture2D,
-    press_texture: rl.Texture2D,
+    hov_texture: ?rl.Texture2D,
+    press_texture: ?rl.Texture2D,
     mPos: rl.Vector2,
 ) bool {
     var texture: rl.Texture2D = reg_texture;
@@ -25,10 +25,10 @@ pub fn imgBtn(
         rl.Rectangle.init(pos.x - regScaledWidth / 2, pos.y - regScaledHeight / 2, regScaledWidth, regScaledHeight),
     )) blk: {
         if (rl.isMouseButtonDown(.left)) {
-            texture = press_texture;
+            texture = press_texture orelse reg_texture;
             break :blk true;
         }
-        texture = hov_texture;
+        texture = hov_texture orelse reg_texture;
         break :blk false;
     } else false;
     const scaledWidth = @as(f32, @floatFromInt(texture.width)) * scaleFactor;
