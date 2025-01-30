@@ -124,11 +124,13 @@ pub fn main() anyerror!void {
                     gui.drawTextureCentered(0.8, 0, assets.playBg.getOrLoad());
                     if (gui.backBtn(mousePos)) {
                         currentScreen = .{ .ComponentInfo = place.location };
+                        game.unloadLevel();
                     }
                     const location = place.location.getInfo();
 
-                    if (game.levelUnloaded())
+                    if (game.levelUnloaded()) {
                         game.loadLevel(location.levels[place.level]);
+                    }
 
                     if (game.loop()) {
                         if (place.level < location.levels.len - 1) {
@@ -136,6 +138,7 @@ pub fn main() anyerror!void {
                             game.loadLevel(location.levels[place.level]);
                         } else {
                             currentScreen = .Globe;
+                            game.unloadLevel();
                             for (&pois, 0..) |*poi, idx| {
                                 if (poi.location == place.location) {
                                     poi.isCompleted = true;
@@ -202,6 +205,8 @@ pub fn main() anyerror!void {
                             rl.Rectangle.init(info_anchor.x, info_anchor.y + 600 + @as(f32, @floatFromInt(75 * ix)), 500, 50),
                             lev.name,
                         ) == 1) {
+                            std.debug.print("{s}\n", .{lev.name});
+
                             currentScreen = .{
                                 .Play = .{
                                     .level = @intCast(ix),
