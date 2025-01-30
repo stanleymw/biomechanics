@@ -19,6 +19,9 @@ pub fn main() anyerror!void {
     rl.initWindow(screenWidth, screenHeight, "game2");
     defer rl.closeWindow(); // Close window and OpenGL context
 
+    rl.initAudioDevice();
+    defer rl.closeAudioDevice();
+
     const mainFont = rl.Font.initEx(
         fonts.Family.ArkPixel,
         fonts.Size.Medium,
@@ -38,7 +41,15 @@ pub fn main() anyerror!void {
     defer assets.soundPool.deinitAll();
 
     // runtime data
+    var startedCutscene = false;
+    var finishedAudio1 = false;
+    //var finishedAudio2 = false;
+    var startTime: ?f64 = null;
+    const sound1 = assets.introductionSpeech1.getOrLoad().sound;
+    const sound2 = assets.introductionSpeech2.getOrLoad().sound;
+
     var currentScreen: types.Screen = .MainMenu;
+    var current_text: *const []const u8 = &"";
 
     var mousePos = rl.Vector2.zero();
 
@@ -151,7 +162,108 @@ pub fn main() anyerror!void {
                     }
                 },
                 .Info => {
-                    currentScreen = .Globe;
+                    // rendering bg
+                    const asset = if (!finishedAudio1)
+                        assets.desertCutscene.getOrLoad()
+                    else
+                        assets.labCutscene.getOrLoad();
+                    asset.drawEx(
+                        rl.Vector2.zero(),
+                        0,
+                        utils.renderSize().x / @as(f32, @floatFromInt(asset.width)),
+                        rl.Color.white,
+                    );
+
+                    const bounds = rl.measureTextEx(
+                        mainFont,
+                        @ptrCast(current_text.*),
+                        fonts.Size.Medium,
+                        0,
+                    );
+
+                    rl.drawRectangleRec(
+                        rl.Rectangle.init(
+                            utils.renderSize().x / 2 - (bounds.x / 2) - consts.tooltip_padding,
+                            utils.renderSize().y / 2 - 100,
+                            bounds.x + (2 * consts.tooltip_padding),
+                            bounds.y,
+                        ),
+                        rl.Color.black,
+                    );
+
+                    rl.drawTextEx(
+                        mainFont,
+                        @ptrCast(current_text.*),
+                        utils.renderSize().scale(0.5).add(utils.v2(-(bounds.x / 2), -100)),
+                        fonts.Size.Medium,
+                        0,
+                        rl.Color.white,
+                    );
+
+                    if (!startedCutscene) {
+                        startTime = rl.getTime();
+                        startedCutscene = true;
+
+                        rl.playSound(sound1);
+                        continue;
+                    }
+                    // time since audio started
+                    const time_delta = rl.getTime() - startTime.?;
+
+                    if (!finishedAudio1) {
+                        switch (@as(u8, @intFromFloat(time_delta))) {
+                            0...2 => current_text = &"Beginning in the second half of the 21st century,",
+                            3...9 => current_text = &"a series of climate disasters made 38% of the land\nonce suitable for nurturing humanity unlivable.",
+                            else => current_text = &"By 2075, for the first time in history since the black\ndeath, the global population decreased.",
+                        }
+                    } else {
+                        switch (@as(u8, @intFromFloat(time_delta))) {
+                            0...4 => current_text = &"In the following decades, the UN has redoubled its\nefforts to fight climate change.",
+                            5...8 => current_text = &"At the heart of its campaign has been a new department,\nheaded by you,",
+                            9...11 => current_text = &"for the development of technologies that work\nwith nature to rebuild the planet.",
+                            12...18 => current_text = &"You stand on the edge of triumph, about to oversee\nthe completion of these machines to save your species,",
+                            19...20 => current_text = &"which are 25 years in the making.",
+                            else => current_text = &"Only a few problems remain to be solved before the biomechanics\nof the earth are put back into balance.",
+                        }
+                    }
+
+                    // skipping w/ mouse
+                    if (rl.isMouseButtonPressed(.left)) {
+                        if (!finishedAudio1) {
+                            rl.stopSound(sound1);
+                            finishedAudio1 = true;
+                            rl.playSound(sound2);
+                            startTime = rl.getTime();
+                        } else {
+                            rl.stopSound(sound2);
+                            currentScreen = .Globe;
+                        }
+                    }
+                    if (!finishedAudio1 and time_delta > 16.5) {
+                        finishedAudio1 = true;
+                        rl.playSound(sound2);
+                        startTime = rl.getTime();
+                    }
+                    if (finishedAudio1 and time_delta > 26.5) {
+                        rl.stopSound(sound2);
+                        currentScreen = .Globe;
+                    }
+
+                    // if (!(finishedAudio1 or rl.isSoundPlaying(sound1))) {
+                    //     finishedAudio1 = true;
+                    //     rl.playSound(sound2);
+                    //     continue;
+                    // }
+                    // if (finishedAudio1 and !rl.isSoundPlaying(sound2)) {
+                    //     finishedAudio2 = true;
+                    // }
+                    // std.debug.print("test: {}\n", .{rl.isSoundPlaying(sound1)});
+
+                    // if (time_delta > 42.5) { // (finishedAudio1 and finishedAudio2) {
+                    //     currentScreen = .Globe;
+                    // }
+
+                    //currentScreen = .Globe;
                 },
                 .LocationInfo => |*location| {
                     if (gui.backBtn(mousePos)) {

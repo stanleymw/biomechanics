@@ -14,6 +14,25 @@ pub fn AssetPool(comptime T: type) type {
     };
 }
 
+pub const SoundWrapper = struct {
+    sound: rl.Sound,
+    pub fn play(self: SoundWrapper) void {
+        rl.playSound(self.sound);
+    }
+    pub fn stop(self: SoundWrapper) void {
+        rl.stopSound(self.sound);
+    }
+    pub fn isPlaying(self: SoundWrapper) bool {
+        return rl.isSoundPlaying(self.sound);
+    }
+    pub fn loadFrom(fp: [*:0]const u8) SoundWrapper {
+        return .{ .sound = rl.loadSound(fp) };
+    }
+    pub fn deinit(self: SoundWrapper) void {
+        rl.unloadSound(self.sound);
+    }
+};
+
 /// Audio or Texture Stream
 pub fn Asset(comptime T: type) type {
     return struct {
@@ -28,8 +47,8 @@ pub fn Asset(comptime T: type) type {
             if (self.asset == null) {
                 if (comptime T == rl.Texture)
                     self.asset = rl.Texture.fromImage(rl.Image.init(self.file_path))
-                else if (comptime T == rl.Sound)
-                    self.asset = rl.loadSound(self.file_path);
+                else if (comptime T == SoundWrapper)
+                    self.asset = SoundWrapper.loadFrom(self.file_path);
             }
             return self.asset.?;
         }
@@ -38,15 +57,16 @@ pub fn Asset(comptime T: type) type {
             if (self.asset) |x| {
                 if (comptime T == rl.Texture)
                     x.unload()
-                else if (comptime T == rl.Sound)
-                    rl.unloadSound(x);
+                else if (comptime T == SoundWrapper) {
+                    x.deinit();
+                }
             }
         }
     };
 }
 // aliases for easier usage
 pub const TAsset = Asset(rl.Texture);
-pub const SAsset = Asset(rl.Sound);
+pub const SAsset = Asset(SoundWrapper);
 
 pub var poiPinTex = TAsset.init("resources/poi-ani.png");
 pub var poiPinLockedTex = TAsset.init("resources/locked-pin.png");
@@ -134,7 +154,7 @@ pub var introductionSpeech1 = SAsset.init("resources/audio/intro1.ogg");
 pub var introductionSpeech2 = SAsset.init("resources/audio/intro2.ogg");
 pub var endingSpeech = SAsset.init("resources/audio/ending.ogg");
 
-pub var soundPool = AssetPool(rl.Sound).init(&.{
+pub var soundPool = AssetPool(SoundWrapper).init(&.{
     &introductionSpeech1,
     &introductionSpeech2,
     &endingSpeech,
