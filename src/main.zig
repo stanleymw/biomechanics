@@ -65,7 +65,7 @@ pub fn main() anyerror!void {
 
     var pois = [_]gui.PoiPin{
         gui.PoiPin.init(.SolarPanels, 0.75, 0.45, false),
-        gui.PoiPin.init(.Nuclear, 0.60, 0.65, true),
+        gui.PoiPin.init(.Nuclear, 0.60, 0.65, false),
         gui.PoiPin.init(.CarbonCapture, 0.44, 0.37, true),
     };
 
@@ -133,20 +133,27 @@ pub fn main() anyerror!void {
                 },
                 .Play => |*place| {
                     gui.drawTextureCentered(0.8, 0, assets.playBg.getOrLoad());
+
+                    const location = place.location.getInfo();
                     if (gui.backBtn(mousePos)) {
                         currentScreen = .{ .ComponentInfo = place.location };
+                        game.unloadLevel();
+                        std.debug.print("unloaded: {}\n", .{game.levelUnloaded()});
+                    } else {
+                        if (game.levelUnloaded()) {
+                            game.loadLevel(location.levels[place.level]);
+                            std.debug.print("loaded: {s}\n", .{location.levels[place.level].name});
+                        }
                     }
-                    const location = place.location.getInfo();
-
-                    if (game.levelUnloaded())
-                        game.loadLevel(location.levels[place.level]);
 
                     if (game.loop()) {
                         if (place.level < location.levels.len - 1) {
                             place.level += 1;
                             game.loadLevel(location.levels[place.level]);
+                            std.debug.print("loaded: {s} due to win\n", .{location.levels[place.level].name});
                         } else {
                             currentScreen = .Globe;
+                            game.unloadLevel();
                             for (&pois, 0..) |*poi, idx| {
                                 if (poi.location == place.location) {
                                     poi.isCompleted = true;
@@ -314,6 +321,9 @@ pub fn main() anyerror!void {
                             rl.Rectangle.init(info_anchor.x, info_anchor.y + 600 + @as(f32, @floatFromInt(75 * ix)), 500, 50),
                             lev.name,
                         ) == 1) {
+                            std.debug.print("request {s}....\n", .{lev.name});
+
+                            game.unloadLevel();
                             currentScreen = .{
                                 .Play = .{
                                     .level = @intCast(ix),
