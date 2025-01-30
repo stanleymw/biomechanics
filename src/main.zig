@@ -35,6 +35,7 @@ pub fn main() anyerror!void {
 
     // Textures unloading (assets are lazily loaded)
     defer assets.assetPool.deinitAll();
+    defer assets.soundPool.deinitAll();
 
     // runtime data
     var currentScreen: types.Screen = .MainMenu;

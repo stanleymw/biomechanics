@@ -58,6 +58,10 @@ pub var gameLogo = TAsset.init("resources/logo.png");
 pub var spaceBg = TAsset.init("resources/space.png");
 pub var playBg = TAsset.init("resources/play-bg.png");
 
+pub var desertCutscene = TAsset.init("resources/cutscenes/desert.png");
+pub var labCutscene = TAsset.init("resources/cutscenes/lab.png");
+pub var endingCutscene = TAsset.init("resources/cutscenes/ending.png");
+
 pub var completedComponent = TAsset.init("resources/component-win.png");
 pub var completedMachine = TAsset.init("resources/machine-win.png");
 
@@ -95,6 +99,10 @@ pub var assetPool = AssetPool(rl.Texture).init(&.{
     &spaceBg,
     &playBg,
 
+    &desertCutscene,
+    &labCutscene,
+    &endingCutscene,
+
     &completedComponent,
     &completedMachine,
 
@@ -122,8 +130,12 @@ pub var assetPool = AssetPool(rl.Texture).init(&.{
     &screw_node,
 });
 
-// pub var introductionSpeech = SAsset.init("");
+pub var introductionSpeech1 = SAsset.init("resources/audio/intro1.ogg");
+pub var introductionSpeech2 = SAsset.init("resources/audio/intro2.ogg");
+pub var endingSpeech = SAsset.init("resources/audio/ending.ogg");
 
-// pub var soundPool = AssetPool(rl.Sound).init(&.{
-//     &introductionSpeech
-// });
+pub var soundPool = AssetPool(rl.Sound).init(&.{
+    &introductionSpeech1,
+    &introductionSpeech2,
+    &endingSpeech,
+});
