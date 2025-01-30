@@ -93,16 +93,22 @@ pub fn main() anyerror!void {
                             },
                             .Hovered => {
                                 const dat: [*:0]const u8 = @ptrCast(poi.location.getInfo().name);
-                                const bounds = rl.measureTextEx(mainFont, dat, fonts.Size.Medium, 0);
+                                const bounds = rl.measureTextEx(mainFont, dat, fonts.Size.Small, 0);
                                 rl.drawRectangleRec(
-                                    rl.Rectangle.init(mousePos.x - bounds.x / 2, mousePos.y + 16, bounds.x, bounds.y),
+                                    rl.Rectangle.init(
+                                        mousePos.x - (bounds.x / 2) - consts.tooltip_padding,
+                                        mousePos.y + 32,
+                                        bounds.x + (2 * consts.tooltip_padding),
+                                        bounds.y,
+                                    ),
                                     rl.Color.black,
                                 );
+
                                 rl.drawTextEx(
                                     mainFont,
                                     dat,
-                                    rl.Vector2.init(mousePos.x - (bounds.x / 2), mousePos.y + 16),
-                                    fonts.Size.Medium,
+                                    rl.Vector2.init(mousePos.x - (bounds.x / 2), mousePos.y + 32),
+                                    fonts.Size.Small,
                                     0,
                                     rl.Color.white,
                                 );
