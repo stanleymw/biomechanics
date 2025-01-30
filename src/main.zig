@@ -92,11 +92,10 @@ pub fn main() anyerror!void {
                             },
                             .Hovered => {
                                 const dat: [*:0]const u8 = @ptrCast(poi.location.getInfo().name);
-                                const bounds = rl.measureText(dat, fonts.Size.Medium);
-                                rl.drawText(dat, (@divTrunc(rl.getRenderWidth(), 2)) - (@divTrunc(bounds, 2)), rl.getRenderHeight() >> 1, 32, rl.Color.white);
+                                const bounds = rl.measureTextEx(mainFont, dat, fonts.Size.Medium, 0);
+                                rl.drawTextEx(mainFont, dat, rl.Vector2.init(mousePos.x - (bounds.x / 2), mousePos.y + 16), fonts.Size.Medium, 0, rl.Color.white);
                             },
                             else => {},
-                            //poi.isCompleted = true;
                         }
                     }
                     if (location != null) {
