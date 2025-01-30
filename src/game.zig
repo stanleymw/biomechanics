@@ -413,7 +413,7 @@ pub fn loop() bool {
     if (rendering_target) {
         rl.drawText("Target State", 0, 0, 48, rl.Color.white);
     }
-    if (hasWon()) {
+    if (rl.isKeyDown(.right_bracket) or hasWon()) {
         if (gui.imgBtn(
             0.6,
             utils.renderSize().scale(0.5),
