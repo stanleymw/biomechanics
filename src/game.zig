@@ -108,6 +108,38 @@ fn isContiguous(typ: Direction, idx: usize) bool {
             }
             return true;
         },
+        .DiagonalUp => {
+            const row = Level.state.len;
+            const col = Level.state[0].len;
+
+            var start_col: usize = undefined;
+            if (row >= idx) {
+                start_col = 0;
+            } else {
+                start_col = idx - row;
+            }
+
+            const count: usize = @min(idx, (col - start_col), row);
+
+            var tracking = false;
+            var left = false;
+            for (0..count) |j| {
+                const xc = @min(row, idx) - j;
+                const yc = start_col + j;
+
+                if (Level.state[xc][yc]) |_| {
+                    tracking = true;
+                    if (left) {
+                        return false;
+                    }
+                } else {
+                    if (tracking) {
+                        left = true;
+                    }
+                }
+            }
+            return true;
+        },
         else => {
             unreachable;
         },
@@ -158,15 +190,47 @@ fn shiftDiagDown(idx: usize, amount: i32) void {
 }
 
 fn shiftDiagUp(idx: usize, amount: i32) void {
+    const row = Level.state.len;
+    const col = Level.state[0].len;
+
+    var start_col: usize = undefined;
+    if (row >= idx) {
+        start_col = 0;
+    } else {
+        start_col = idx - row;
+    }
+
+    const count: usize = @min(idx, (col - start_col), row);
+
     if (amount >= 0) {
-        if (Level.state[0][idx] != null) {
-            return; // prevent from shifting out of the world
+        var j = count;
+
+        var firsty = true;
+        while (j > 0) : (j -= 1) {
+            const xc = @min(row, idx) - j;
+            const yc = start_col + j;
+            if (firsty and Level.state[xc][yc] != null) {
+                return;
+            } else {
+                firsty = false;
+            }
+            Level.state[xc][yc] = Level.state[xc + 1][yc - 1];
+            Level.state[xc + 1][yc - 1] = null;
         }
-        var i = idx;
-        while (i > 0) : (i -= 1) {
-            Level.state[idx - i][i] = Level.state[idx - i + 1][i - 1];
+    } else {
+        var firsty = true;
+        for (0..count) |j| {
+            const xc = @min(row, idx) - j;
+            const yc = start_col + j;
+            if (firsty and Level.state[xc][yc] != null) {
+                return;
+            } else {
+                firsty = false;
+            }
+            Level.state[xc][yc] = Level.state[xc - 1][yc + 1];
+            Level.state[xc - 1][yc + 1] = null;
         }
-    } else {}
+    }
 }
 
 fn shiftRow(idx: usize, amount: i32) void {
@@ -350,9 +414,11 @@ pub fn loop() bool {
             selectedIndex = @mod(selectedIndex, directionToWires(cursorState).len);
 
             if (rl.isKeyPressed(.right)) {
-                shiftDiagUp(selectedIndex, 1);
+                shiftDiagUp(Level.diag_up_wires[selectedIndex], 1);
             }
-            if (rl.isKeyPressed(.left)) {}
+            if (rl.isKeyPressed(.left)) {
+                shiftDiagUp(Level.diag_up_wires[selectedIndex], -1);
+            }
         },
         .Horizontal => {
             if (rl.isKeyPressed(.down)) {

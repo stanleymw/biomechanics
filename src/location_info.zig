@@ -129,15 +129,26 @@ pub var location_data = [_]LocationData{
         .image_name = &assets.nuclearMachine,
         .levels = &[_]LevelData{
             LevelData{
-                .vertical_wires = &[_]u8{ 6, 7 },
-                .horizontal_wires = &[_]u8{ 6, 7 },
-                .diag_up_wires = &[_]u8{},
+                .vertical_wires = &[_]u8{},
+                .horizontal_wires = &[_]u8{},
+                .diag_up_wires = &[_]u8{ 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 },
                 .diag_down_wires = &[_]u8{},
                 .state = StateBuilder
                     .empty()
-                    .box(6, 6, 8, 8, 0)
+                    .point(10, 6, 1)
+                    .point(8, 8, 1)
+                    .point(7, 7, 1)
+                    .point(8, 6, 1)
                     .point(6, 6, 1)
-                    .point(7, 7, 2)
+                    .point(5, 5, 1)
+                    .point(4, 4, 1)
+                    .point(3, 3, 1)
+                    .point(2, 2, 1)
+                    .point(1, 1, 1)
+                    .point(7, 5, 2)
+                    .point(8, 4, 2)
+                    .point(9, 3, 2)
+                    .point(10, 2, 2)
                     .build(),
                 .target_state = StateBuilder
                     .empty()
