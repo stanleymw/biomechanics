@@ -7,8 +7,6 @@ const gui = @import("gui.zig");
 const utils = @import("utils.zig");
 const assets = @import("assets.zig");
 
-const N = 3;
-
 var selectedIndex: usize = 0;
 
 const Direction = enum(u2) { Vertical, DiagonalUp, Horizontal, DiagonalDown };
@@ -62,6 +60,41 @@ fn isSameSizeAsTargetStateWire(typ: Direction, idx: usize) bool {
             }
             return count == target_count;
         },
+        .DiagonalUp => {
+            const N = Level.state.len;
+            const diag_len = @min(idx, 2 * N - idx);
+            var xc: usize = @min(idx, N) - 1;
+            var yc: usize = undefined;
+            if (N >= idx) {
+                yc = 0;
+            } else {
+                yc = idx - N;
+            }
+
+            var count: u8 = 0;
+            const old_xc = xc;
+            const old_yc = yc;
+
+            for (0..diag_len - 1) |_| {
+                if (Level.state[xc][yc]) |_| {
+                    count += 1;
+                }
+                xc -= 1;
+                yc += 1;
+            }
+
+            var target_count: u8 = 0;
+            xc = old_xc;
+            yc = old_yc;
+            for (0..diag_len - 1) |_| {
+                if (Level.target_state[xc][yc]) |_| {
+                    target_count += 1;
+                }
+                xc -= 1;
+                yc += 1;
+            }
+            return count == target_count;
+        },
         else => {
             unreachable;
         },
@@ -109,24 +142,19 @@ fn isContiguous(typ: Direction, idx: usize) bool {
             return true;
         },
         .DiagonalUp => {
-            const row = Level.state.len;
-            const col = Level.state[0].len;
-
-            var start_col: usize = undefined;
-            if (row >= idx) {
-                start_col = 0;
+            const N = Level.state.len;
+            const diag_len = @min(idx, 2 * N - idx);
+            var xc: usize = @min(idx, N) - 1;
+            var yc: usize = undefined;
+            if (N >= idx) {
+                yc = 0;
             } else {
-                start_col = idx - row;
+                yc = idx - N;
             }
-
-            const count: usize = @min(idx, (col - start_col), row);
-
             var tracking = false;
             var left = false;
-            for (0..count) |j| {
-                const xc = @min(row, idx) - j;
-                const yc = start_col + j;
 
+            for (0..diag_len - 1) |_| {
                 if (Level.state[xc][yc]) |_| {
                     tracking = true;
                     if (left) {
@@ -137,6 +165,9 @@ fn isContiguous(typ: Direction, idx: usize) bool {
                         left = true;
                     }
                 }
+
+                xc -= 1;
+                yc += 1;
             }
             return true;
         },
@@ -190,33 +221,46 @@ fn shiftDiagDown(idx: usize, amount: i32) void {
 }
 
 fn shiftDiagUp(idx: usize, amount: i32) void {
-    const row = Level.state.len;
-    const col = Level.state[0].len;
+    if (!isContiguous(.DiagonalUp, idx)) {
+        std.debug.print("NOT CONTIUGOUS\n", .{});
+        return;
+    }
+    if (!isSameSizeAsTargetStateWire(.DiagonalUp, idx)) {
+        return;
+    }
 
-    const start_col: i32 = @max(0, @as(i32, @intCast(idx)) - @as(i32, @intCast(row)));
-
-    const count: usize = @min(idx, @as(usize, @intCast(@as(i32, @intCast(col)) - start_col)), row);
-
+    const N = Level.state.len;
+    const diag_len = @min(idx, 2 * N - idx);
+    var xc: usize = @min(idx, N) - 1;
+    var yc: usize = undefined;
+    if (N >= idx) {
+        yc = 0;
+    } else {
+        yc = idx - N;
+    }
     if (amount >= 0) {
-        var j = count;
+        // var j = count;
+        const tmp: usize = xc;
+        xc = yc;
+        yc = tmp;
 
         var firsty = true;
-        while (j > 0) : (j -= 1) {
-            const xc = @min(row, idx) - j;
-            const yc = @as(usize, @intCast(start_col + @as(i32, @intCast(j))));
+        for (0..diag_len - 1) |_| {
             if (firsty and Level.state[xc][yc] != null) {
                 return;
             } else {
                 firsty = false;
             }
+
             Level.state[xc][yc] = Level.state[xc + 1][yc - 1];
             Level.state[xc + 1][yc - 1] = null;
+            xc += 1;
+            yc -= 1;
         }
     } else {
         var firsty = true;
-        for (0..count) |j| {
-            const xc = @min(row, idx) - j;
-            const yc = @as(usize, @intCast(start_col + @as(i32, @intCast(j))));
+        for (0..diag_len - 1) |_| {
+            std.debug.print("SHIFT DIAGUP DOWN: {} {} for IDX={}\n", .{ xc, yc, idx });
             if (firsty and Level.state[xc][yc] != null) {
                 return;
             } else {
@@ -224,6 +268,8 @@ fn shiftDiagUp(idx: usize, amount: i32) void {
             }
             Level.state[xc][yc] = Level.state[xc - 1][yc + 1];
             Level.state[xc - 1][yc + 1] = null;
+            xc -= 1;
+            yc += 1;
         }
     }
 }
@@ -409,10 +455,10 @@ pub fn loop() bool {
             selectedIndex = @mod(selectedIndex, directionToWires(cursorState).len);
 
             if (rl.isKeyPressed(.right)) {
-                shiftDiagUp(Level.diag_up_wires[selectedIndex], 1);
+                shiftDiagUp(Level.diag_up_wires[selectedIndex] + 1, 1);
             }
             if (rl.isKeyPressed(.left)) {
-                shiftDiagUp(Level.diag_up_wires[selectedIndex], -1);
+                shiftDiagUp(Level.diag_up_wires[selectedIndex] + 1, -1);
             }
         },
         .Horizontal => {

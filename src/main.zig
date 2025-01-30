@@ -12,8 +12,8 @@ const types = @import("types.zig");
 const consts = @import("consts.zig");
 const assets = @import("assets.zig");
 
-const screenWidth = 1080;
-const screenHeight = 1080;
+const screenWidth = 900;
+const screenHeight = 900;
 
 pub fn main() anyerror!void {
     rl.initWindow(screenWidth, screenHeight, "game2");
