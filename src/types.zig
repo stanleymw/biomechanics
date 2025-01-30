@@ -14,8 +14,8 @@ pub const Screen = union(enum) {
 
 pub const Location = enum(u2) {
     SolarPanels,
-    CarbonCapture,
     Nuclear,
+    CarbonCapture,
     pub fn getInfo(self: Location) LocationData {
         return location_info.location_data[@intFromEnum(self)];
     }

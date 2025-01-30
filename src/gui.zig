@@ -9,6 +9,52 @@ const assets = @import("assets.zig");
 
 const ButtonState = enum { Pressed, Hovered, Regular };
 
+pub fn backBtn(mPos: rl.Vector2) bool {
+    return imgBtnNotCentered(
+        0.2,
+        rl.Vector2.zero(),
+        assets.backBtn.getOrLoad(),
+        null,
+        null,
+        mPos,
+    );
+}
+
+pub fn imgBtnNotCentered(
+    scaleFactor: f32,
+    pos: rl.Vector2,
+    reg_texture: rl.Texture2D,
+    hov_texture: ?rl.Texture2D,
+    press_texture: ?rl.Texture2D,
+    mPos: rl.Vector2,
+) bool {
+    var texture: rl.Texture2D = reg_texture;
+
+    const regScaledWidth = @as(f32, @floatFromInt(reg_texture.width)) * scaleFactor;
+    const regScaledHeight = @as(f32, @floatFromInt(reg_texture.height)) * scaleFactor;
+
+    const pressed = if (rl.checkCollisionPointRec(
+        mPos,
+        rl.Rectangle.init(pos.x, pos.y, regScaledWidth, regScaledHeight),
+    )) blk: {
+        if (rl.isMouseButtonPressed(.left)) {
+            texture = press_texture orelse reg_texture;
+            break :blk true;
+        }
+        texture = hov_texture orelse reg_texture;
+        break :blk false;
+    } else false;
+
+    rl.drawTextureEx(
+        texture,
+        pos,
+        0.0,
+        scaleFactor,
+        rl.Color.white,
+    );
+    return pressed;
+}
+
 pub fn imgBtn(
     scaleFactor: f32,
     pos: rl.Vector2,
@@ -26,7 +72,7 @@ pub fn imgBtn(
         mPos,
         rl.Rectangle.init(pos.x - regScaledWidth / 2, pos.y - regScaledHeight / 2, regScaledWidth, regScaledHeight),
     )) blk: {
-        if (rl.isMouseButtonDown(.left)) {
+        if (rl.isMouseButtonPressed(.left)) {
             texture = press_texture orelse reg_texture;
             break :blk true;
         }

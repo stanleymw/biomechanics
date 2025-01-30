@@ -20,7 +20,7 @@ pub fn main() anyerror!void {
     defer rl.closeWindow(); // Close window and OpenGL context
 
     const mainFont = rl.Font.initEx(
-        fonts.Family.ComputerModern,
+        fonts.Family.ArkPixel,
         fonts.Size.Medium,
         null,
     );
@@ -115,6 +115,9 @@ pub fn main() anyerror!void {
                 },
                 .Play => |*place| {
                     gui.drawTextureCentered(0.8, 0, assets.playBg.getOrLoad());
+                    if (gui.backBtn(mousePos)) {
+                        currentScreen = .{ .ComponentInfo = place.location };
+                    }
                     const location = place.location.getInfo();
 
                     if (game.levelUnloaded())
@@ -131,7 +134,7 @@ pub fn main() anyerror!void {
                                     poi.isCompleted = true;
                                     if (idx + 1 < pois.len) {
                                         pois[idx + 1].isLocked = false;
-                                    }
+                                    } // else game is complete
 
                                     break;
                                 }
@@ -144,30 +147,49 @@ pub fn main() anyerror!void {
                     currentScreen = .Globe;
                 },
                 .LocationInfo => |*location| {
+                    if (gui.backBtn(mousePos)) {
+                        currentScreen = .Globe; // .{ .LocationInfo = location.* };
+                    }
                     const info = location.getInfo();
-                    const anchor = rl.Vector2.init(190, 200);
-                    rl.drawTextureEx(
-                        info.image_name.getOrLoad(),
-                        anchor.add(rl.Vector2.init(0, 100)),
-                        0,
-                        0.5,
-                        rl.Color.white,
-                    );
+                    const anchor = rl.Vector2.init(190, 75);
+                    const tex = info.image_name.getOrLoad();
+                    const tex_h = @as(f32, @floatFromInt(tex.height));
+                    const scale_factor = (utils.renderSize().x - 2 * anchor.x) / @as(f32, @floatFromInt(tex.width));
+
                     rl.drawTextEx(
                         mainFont,
-                        switch (location.*) {
-                            .SolarPanels => "Solar Panel",
-                            .Nuclear => "Nuclear",
-                            else => "meow",
-                        },
+                        @ptrCast(info.name),
                         anchor,
                         fonts.Size.Medium,
                         0,
                         rl.Color.light_gray,
                     );
+                    tex.drawEx(
+                        anchor.add(utils.yv(fonts.Size.Medium)),
+                        0.0,
+                        scale_factor,
+                        rl.Color.white,
+                    );
+                    if (gui.imgBtn(
+                        1.0,
+                        anchor.add(utils.yv(scale_factor * tex_h + 20)),
+                        assets.continueBtn.getOrLoad(),
+                        assets.continueBtnHover.getOrLoad(),
+                        assets.continueBtnPress.getOrLoad(),
+                        mousePos,
+                    )) {
+                        currentScreen = .{ .ComponentInfo = location.* };
+                    }
+
                     text_view.setText(info.info);
                     //text_view.render();
 
+                    // RENDER IMAGE OF MACHINE
+                },
+                .ComponentInfo => |*location| {
+                    if (gui.backBtn(mousePos)) {
+                        currentScreen = .{ .LocationInfo = location.* };
+                    }
                     for (location.getInfo().levels, 0..) |lev, ix| {
                         if (rg.guiButton(
                             rl.Rectangle.init(info_anchor.x, info_anchor.y + 600 + @as(f32, @floatFromInt(75 * ix)), 500, 50),
@@ -181,10 +203,7 @@ pub fn main() anyerror!void {
                             };
                         }
                     }
-
-                    // RENDER IMAGE OF MACHINE
                 },
-                .ComponentInfo => {}, //|*location| {},
                 .Ending => {
                     rl.drawTextEx(
                         mainFont,

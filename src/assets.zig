@@ -65,9 +65,17 @@ pub var solarMachine = TAsset.init("resources/POI/SolarPanel/machine.png");
 pub var nuclearMachine = TAsset.init("resources/POI/NuclearReactor/machine.png");
 pub var carbonMachine = TAsset.init("resources/POI/CarbonCapture/machine.png");
 
+pub var backBtn = TAsset.init("resources/back-btn.png");
+pub var checkmark = TAsset.init("resources/checkmark.png");
+pub var lock = TAsset.init("resources/lock.png");
+
 pub var playBtn = TAsset.init("resources/play-btn.png");
 pub var playBtnHover = TAsset.init("resources/play-btn-hover.png");
 pub var playBtnPress = TAsset.init("resources/play-btn-press.png");
+
+pub var continueBtn = TAsset.init("resources/continue-btn.png");
+pub var continueBtnHover = TAsset.init("resources/continue-btn-hover.png");
+pub var continueBtnPress = TAsset.init("resources/continue-btn-pressed.png");
 
 pub var standard_node = TAsset.init("resources/POI/standard-node.png");
 
@@ -94,9 +102,17 @@ pub var assetPool = AssetPool(rl.Texture).init(&.{
     &nuclearMachine,
     &carbonMachine,
 
+    &backBtn,
+    &checkmark,
+    &lock,
+
     &playBtn,
     &playBtnHover,
     &playBtnPress,
+
+    &continueBtn,
+    &continueBtnHover,
+    &continueBtnPress,
 
     &standard_node,
 
@@ -105,3 +121,9 @@ pub var assetPool = AssetPool(rl.Texture).init(&.{
     &sealant_node,
     &screw_node,
 });
+
+// pub var introductionSpeech = SAsset.init("");
+
+// pub var soundPool = AssetPool(rl.Sound).init(&.{
+//     &introductionSpeech
+// });

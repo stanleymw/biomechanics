@@ -10,6 +10,7 @@ pub const Size = struct {
 
 pub const Family = struct {
     pub const ComputerModern = "resources/font.otf";
+    pub const ArkPixel = "resources/ark-pixel-10px.otf";
 };
 
 pub fn loadFont(f: [*:0]const u8, s: i32) rl.Font {
