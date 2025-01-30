@@ -94,9 +94,15 @@ pub fn main() anyerror!void {
                                 const dat: [*:0]const u8 = @ptrCast(poi.location.getInfo().name);
                                 const bounds = rl.measureTextEx(mainFont, dat, fonts.Size.Medium, 0);
                                 rl.drawRectangleRec(
-                                    rl.Rectangle.init(mousePos.x - bounds.x / 2, mousePos.y + 16, bounds.x, bounds.y),
+                                    rl.Rectangle.init(
+                                        mousePos.x - (bounds.x / 2) - consts.tooltip_padding,
+                                        mousePos.y + 16,
+                                        bounds.x + (2 * consts.tooltip_padding),
+                                        bounds.y,
+                                    ),
                                     rl.Color.black,
                                 );
+
                                 rl.drawTextEx(
                                     mainFont,
                                     dat,
