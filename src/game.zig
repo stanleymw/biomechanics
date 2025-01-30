@@ -26,6 +26,10 @@ pub fn loadLevel(level: types.LevelData) void {
     Level = level;
 }
 
+pub fn unloadLevel() void {
+    level_loaded = false;
+}
+
 fn isSameSizeAsTargetStateWire(typ: Direction, idx: usize) bool {
     switch (typ) {
         .Horizontal => {
