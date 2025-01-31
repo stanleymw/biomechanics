@@ -14,10 +14,7 @@ jobs:
           version: latest
       - uses: mymindstorm/setup-emsdk@v14
       - run: emcc -v
-      - run: whereis emcc
-      - run: pwd
-      - run: ls -lash
-      - run: zig build
+      - run: zig build -Dtarget=wasm32-emscripten -Doptimize=ReleaseFast --sysroot "$EMSDK/upstream/emscripten"
       - uses: actions/upload-artifact@v4.6.0
         with:
           name: BioMechanics
