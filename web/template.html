@@ -5,12 +5,18 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>Biomechanics: The Puzzles of restoration</title>
     <style>
+      body { background-image: url(./website-bg.png); color: white; }
+      #output {
+        display: none !important;
+      }
+      body hr {
+        display: none !important;
+      }
       .emscripten { padding-right: 0; margin-left: auto; margin-right: auto; display: block; }
       textarea.emscripten { font-family: monospace; width: 80%; }
       div.emscripten { text-align: center; }
-      div.emscripten_border { border: 1px solid black; }
       /* the canvas *must not* have any border or padding, or mouse coords will be wrong */
-      canvas.emscripten { border: 0px none; background-color: black; }
+      canvas.emscripten { border: 0px none; background-color: black; height: 90vh }
 
       .spinner {
         height: 50px;
