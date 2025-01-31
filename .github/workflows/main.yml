@@ -4,7 +4,7 @@ on:
       - main
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
     name: Build
     steps:
@@ -13,9 +13,36 @@ jobs:
         with:
           version: latest
       - uses: mymindstorm/setup-emsdk@v14
-      - run: emcc -v
       - run: zig build -Dtarget=wasm32-emscripten -Doptimize=ReleaseFast --sysroot "$EMSDK/upstream/emscripten"
+      - name: Upload static files as artifact
+        id: deployment
+        uses: actions/upload-pages-artifact@v3 # or specific "vX.X.X" version tag for this action
+        with:
+          path: zig-out/htmlout/
+
       - uses: actions/upload-artifact@v4.6.0
         with:
           name: BioMechanics
           path: zig-out/
+
+  deploy:
+    # Add a dependency to the build job
+    needs: build
+
+    # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
+    permissions:
+      pages: write      # to deploy to Pages
+      id-token: write   # to verify the deployment originates from an appropriate source
+
+    # Deploy to the github-pages environment
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    # Specify runner + deployment step
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4 # or specific "vX.X.X" version tag for this action
+          
