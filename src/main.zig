@@ -124,38 +124,43 @@ pub fn main() anyerror!void {
                             else => {},
                         }
                     }
-                    if (location != null) {
-                        currentScreen = types.Screen{ .LocationInfo = location.? };
+                    if (location) |loc| {
+                        currentScreen = types.Screen{ .LocationInfo = loc };
                     }
                 },
                 .Play => |*place| {
                     gui.drawTextureCentered(0.8, 0, assets.playBg.getOrLoad());
 
-                    const location = place.location.getInfo();
+                    const loc_real = place.location;
+                    const loc_info = loc_real.getInfo();
                     if (gui.backBtn(mousePos)) {
                         currentScreen = .{ .ComponentInfo = place.location };
                         game.unloadLevel();
                         std.debug.print("unloaded: {}\n", .{game.levelUnloaded()});
                     } else {
                         if (game.levelUnloaded()) {
-                            game.loadLevel(location.levels[place.level]);
-                            std.debug.print("loaded: {s}\n", .{location.levels[place.level].name});
+                            game.loadLevel(loc_info.levels[place.level]);
+                            std.debug.print("loaded: {s}\n", .{loc_info.levels[place.level].name});
                         }
                     }
 
                     if (game.loop()) {
-                        if (place.level < location.levels.len - 1) {
+                        if (place.level < loc_info.levels.len - 1) {
                             place.level += 1;
-                            game.loadLevel(location.levels[place.level]);
-                            std.debug.print("loaded: {s} due to win\n", .{location.levels[place.level].name});
+
+                            game.loadLevel(loc_info.levels[place.level]);
+                            std.debug.print("loaded: {s} due to win\n", .{loc_info.levels[place.level].name});
                         } else {
                             currentScreen = .Globe;
                             game.unloadLevel();
                             for (&pois, 0..) |*poi, idx| {
-                                if (poi.location == place.location) {
+                                std.debug.print("OUR PLACE: {s}\n", .{loc_real.getInfo().name});
+                                if (poi.location == loc_real) {
                                     poi.isCompleted = true;
+                                    std.debug.print("finished POI {s}\n", .{poi.location.getInfo().name});
                                     if (idx + 1 < pois.len) {
                                         pois[idx + 1].isLocked = false;
+                                        std.debug.print("unlocked next poi due to win\n", .{});
                                     } // else game is complete
 
                                     break;
@@ -318,7 +323,7 @@ pub fn main() anyerror!void {
                             rl.Rectangle.init(info_anchor.x, info_anchor.y + 600 + @as(f32, @floatFromInt(75 * ix)), 500, 50),
                             lev.name,
                         ) == 1) {
-                            std.debug.print("request {s}....\n", .{lev.name});
+                            std.debug.print("request {s}... and setting loc={s}\n", .{ lev.name, location.getInfo().name });
 
                             game.unloadLevel();
                             currentScreen = .{

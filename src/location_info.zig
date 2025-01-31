@@ -132,23 +132,9 @@ pub var location_data = [_]LocationData{
                 .vertical_wires = &[_]u8{},
                 .horizontal_wires = &[_]u8{},
                 .diag_up_wires = &[_]u8{ 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 },
-                .diag_down_wires = &[_]u8{},
+                .diag_down_wires = &[_]u8{ 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 },
                 .state = StateBuilder
                     .empty()
-                    .point(10, 6, 1)
-                    .point(8, 8, 1)
-                    .point(7, 7, 1)
-                    .point(8, 6, 1)
-                    .point(6, 6, 1)
-                    .point(5, 5, 1)
-                    .point(4, 4, 1)
-                    .point(3, 3, 1)
-                    .point(2, 2, 1)
-                    .point(1, 1, 1)
-                    .point(7, 5, 2)
-                    .point(8, 4, 2)
-                    .point(9, 3, 2)
-                    .point(10, 2, 2)
                     .build(),
                 .target_state = StateBuilder
                     .empty()
@@ -232,6 +218,92 @@ pub var location_data = [_]LocationData{
         .name = "Eastern North America - Carbon Capture",
         .image_name = &assets.carbonMachine,
         .info = "placeholder info",
-        .levels = &[_]LevelData{},
+        .levels = &[_]LevelData{
+            LevelData{
+                .vertical_wires = &[_]u8{},
+                .horizontal_wires = &[_]u8{},
+                .diag_up_wires = &[_]u8{ 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 },
+                .diag_down_wires = &[_]u8{ 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 },
+                .state = StateBuilder
+                    .empty()
+                    .hLine(7, 9, 7, 0)
+                    .hLine(7, 9, 9, 0)
+                    .build(),
+                .target_state = StateBuilder
+                    .empty()
+                    .box(6, 6, 8, 8, 0)
+                    .point(6, 6, 1)
+                    .point(6, 7, 2)
+                    .build(),
+                .name = "Capture Unit",
+                .markingPictures = &[_]*assets.TAsset{
+                    &assets.standard_node,
+                    &assets.n_type_silicon_node,
+                    &assets.p_type_silicon_node,
+                },
+                .locked = false,
+            },
+            LevelData{
+                .vertical_wires = &[_]u8{ 5, 7, 9 },
+                .horizontal_wires = &[_]u8{7},
+                .diag_up_wires = &[_]u8{},
+                .diag_down_wires = &[_]u8{},
+                .state = StateBuilder
+                    .empty()
+                    .vLine(5, 5, 8, 0)
+                    .vLine(7, 5, 8, 0)
+                    .vLine(9, 5, 8, 0)
+                    .hLine(4, 11, 7, 0)
+                    .point(5, 8, 1)
+                    .point(7, 8, 1)
+                    .point(9, 8, 1)
+                    .build(),
+                .target_state = StateBuilder
+                    .empty()
+                    .vLine(5, 6, 9, 0)
+                    .vLine(7, 6, 9, 0)
+                    .vLine(9, 6, 9, 0)
+                    .hLine(4, 11, 7, 0)
+                    .point(5, 9, 1)
+                    .point(7, 9, 1)
+                    .point(9, 9, 1)
+                    .build(),
+                .name = "Transport",
+                .markingPictures = &[_]*assets.TAsset{
+                    &assets.standard_node,
+                    &assets.n_type_silicon_node,
+                },
+                .locked = false,
+            },
+            LevelData{
+                .vertical_wires = &[_]u8{7},
+                .horizontal_wires = &[_]u8{ 6, 7 },
+                .diag_up_wires = &[_]u8{},
+                .diag_down_wires = &[_]u8{},
+                .state = StateBuilder
+                    .empty()
+                    .hLine(5, 11, 6, 0)
+                    .hLine(5, 11, 7, 0)
+                    .point(7, 5, 0)
+                    .hLine(8, 11, 6, 1)
+                    .hLine(5, 8, 7, 1)
+                    .build(),
+                .target_state = StateBuilder
+                    .empty()
+                    .hLine(5, 11, 6, 0)
+                    .hLine(5, 11, 7, 0)
+                    .point(7, 5, 0)
+                    .hLine(5, 8, 6, 1)
+                    .hLine(8, 11, 7, 1)
+                    .build(),
+                .name = "Injection Wells",
+                .markingPictures = &[_]*assets.TAsset{
+                    &assets.standard_node,
+                    &assets.n_type_silicon_node,
+                    &assets.p_type_silicon_node,
+                },
+                .locked = false,
+            },
+        },
     },
 };

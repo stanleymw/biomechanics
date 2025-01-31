@@ -95,8 +95,42 @@ fn isSameSizeAsTargetStateWire(typ: Direction, idx: usize) bool {
             }
             return count == target_count;
         },
-        else => {
-            unreachable;
+        .DiagonalDown => {
+            const N = Level.state.len;
+            const diag_len = @min(idx, 2 * N - idx);
+
+            var yc: usize = N - (@min(idx, N));
+            var xc: usize = undefined;
+            if (N >= idx) {
+                xc = 0;
+            } else {
+                xc = idx - N;
+            }
+
+            var count: u8 = 0;
+            const old_xc = xc;
+            const old_yc = yc;
+
+            for (0..diag_len - 1) |_| {
+                if (Level.state[xc][yc]) |_| {
+                    count += 1;
+                }
+
+                xc += 1;
+                yc += 1;
+            }
+
+            var target_count: u8 = 0;
+            xc = old_xc;
+            yc = old_yc;
+            for (0..diag_len - 1) |_| {
+                if (Level.target_state[xc][yc]) |_| {
+                    target_count += 1;
+                }
+                xc += 1;
+                yc += 1;
+            }
+            return count == target_count;
         },
     }
     unreachable;
@@ -171,8 +205,37 @@ fn isContiguous(typ: Direction, idx: usize) bool {
             }
             return true;
         },
-        else => {
-            unreachable;
+        .DiagonalDown => {
+            const N = Level.state.len;
+            const diag_len = @min(idx, 2 * N - idx);
+
+            var yc: usize = N - (@min(idx, N));
+            var xc: usize = undefined;
+            if (N >= idx) {
+                xc = 0;
+            } else {
+                xc = idx - N;
+            }
+
+            var tracking = false;
+            var left = false;
+
+            for (0..diag_len - 1) |_| {
+                if (Level.state[xc][yc]) |_| {
+                    tracking = true;
+                    if (left) {
+                        return false;
+                    }
+                } else {
+                    if (tracking) {
+                        left = true;
+                    }
+                }
+
+                xc += 1;
+                yc += 1;
+            }
+            return true;
         },
     }
     unreachable;
@@ -211,18 +274,65 @@ fn shiftColumn(idx: usize, amount: i32) void {
 }
 
 fn shiftDiagDown(idx: usize, amount: i32) void {
+    if (!isContiguous(.DiagonalDown, idx)) {
+        std.debug.print("NOT CONTIGUOUS\n", .{});
+        return;
+    }
+    if (!isSameSizeAsTargetStateWire(.DiagonalDown, idx)) {
+        return;
+    }
+
+    const N = Level.state.len;
+    const diag_len = @min(idx, 2 * N - idx);
+
+    var yc: usize = N - (@min(idx, N));
+    var xc: usize = undefined;
+    if (N >= idx) {
+        xc = 0;
+    } else {
+        xc = idx - N;
+    }
+
     if (amount < 0) {
-        if (Level.state[idx][0] != null) return;
-        for (1..2 * Level.state[0].len - 2) |x| {
-            Level.state[@intCast(@as(i32, @intCast(idx - x)) + amount)][@intCast(@as(i32, @intCast(x)) + amount)] = Level.state[idx - x][x];
-            Level.state[idx - x][x] = null;
+        // var j = count;
+        const tmp: usize = xc;
+        xc = N - yc - 1;
+        yc = N - tmp - 1;
+
+        var firsty = true;
+        for (0..diag_len - 1) |_| {
+            std.debug.print("SHIFT DIAGDOWN UP: {} {} for IDX={}\n", .{ xc, yc, idx });
+            if (firsty and Level.state[xc][yc] != null) {
+                return;
+            } else {
+                firsty = false;
+            }
+
+            Level.state[xc][yc] = Level.state[xc - 1][yc - 1];
+            Level.state[xc - 1][yc - 1] = null;
+            xc -= 1;
+            yc -= 1;
+        }
+    } else {
+        var firsty = true;
+        for (0..diag_len - 1) |_| {
+            std.debug.print("SHIFT DIAGDOWn DOWN: {} {} for IDX={}\n", .{ xc, yc, idx });
+            if (firsty and Level.state[xc][yc] != null) {
+                return;
+            } else {
+                firsty = false;
+            }
+            Level.state[xc][yc] = Level.state[xc + 1][yc + 1];
+            Level.state[xc + 1][yc + 1] = null;
+            xc += 1;
+            yc += 1;
         }
     }
 }
 
 fn shiftDiagUp(idx: usize, amount: i32) void {
     if (!isContiguous(.DiagonalUp, idx)) {
-        std.debug.print("NOT CONTIUGOUS\n", .{});
+        std.debug.print("NOT CONTIGUOUS\n", .{});
         return;
     }
     if (!isSameSizeAsTargetStateWire(.DiagonalUp, idx)) {
@@ -489,10 +599,10 @@ pub fn loop() bool {
             selectedIndex = @mod(selectedIndex, directionToWires(cursorState).len);
 
             if (rl.isKeyPressed(.right)) {
-                shiftRow(Level.horizontal_wires[selectedIndex], 1);
+                shiftDiagDown(Level.diag_up_wires[selectedIndex] + 1, -1);
             }
             if (rl.isKeyPressed(.left)) {
-                shiftRow(Level.horizontal_wires[selectedIndex], -1);
+                shiftDiagDown(Level.diag_up_wires[selectedIndex] + 1, 1);
             }
         },
     }
