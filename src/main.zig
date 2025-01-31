@@ -417,6 +417,7 @@ pub fn main() anyerror!void {
                         18...22 => current_text = &"and which you have saved.",
                         23...27 => current_text = &"",
                         else => {
+                            startTime = rl.getTime();
                             currentScreen = .Credits;
                         },
                     }
@@ -425,7 +426,9 @@ pub fn main() anyerror!void {
                 },
                 .Credits => {
                     rl.updateMusicStream(ending_music);
-                    rl.drawText("Credits", 0, 0, fonts.Size.Medium, rl.Color.white);
+
+                    const delta = rl.getTime() - startTime.?;
+                    rl.drawTextEx(fonts.main_font, consts.credits, rl.Vector2.init(16, @floatCast((delta * -50) + 1024.0)), fonts.Size.Large, 0, rl.Color.white);
                 },
             }
 
