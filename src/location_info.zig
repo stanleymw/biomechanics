@@ -145,8 +145,8 @@ pub var location_data = [_]LocationData{
                     .diagDownLine(10, 8, 3, 0)
                     .hLine(5, 9, 10, 0)
                     .point(5, 10, 1)
-                    .point(5, 4, 2)
-                    .point(11, 7, 3)
+                    .point(5, 4, 3)
+                    .point(11, 7, 2)
                     .build(),
                 .target_state = StateBuilder
                     .empty()
@@ -159,9 +159,9 @@ pub var location_data = [_]LocationData{
                     .diagUpLine(6, 6, 3, 0)
                     .diagDownLine(10, 8, 3, 0)
                     .hLine(5, 9, 10, 0)
-                    .point(4, 7, 1)
-                    .point(6, 8, 2)
-                    .point(6, 6, 3)
+                    .point(4, 7, 3)
+                    .point(6, 8, 1)
+                    .point(6, 6, 2)
                     .build(),
                 .name = "Nuclear Core",
                 .markingPictures = &[_]*assets.TAsset{
@@ -284,7 +284,7 @@ pub var location_data = [_]LocationData{
                     .diagUpLine(9, 5, 4, 0)
                     .diagDownLine(9, 9, 4, 0)
                     .point(8, 7, 1)
-                    .point(9, 7, 2)
+                    .point(9, 7, 1)
                     .build(),
                 .target_state = StateBuilder
                     .empty()
@@ -292,12 +292,11 @@ pub var location_data = [_]LocationData{
                     .diagUpLine(9, 5, 4, 0)
                     .diagDownLine(9, 9, 4, 0)
                     .point(5, 9, 1)
-                    .point(9, 9, 2)
+                    .point(9, 9, 1)
                     .build(),
                 .name = "Transport",
                 .markingPictures = &[_]*assets.TAsset{
                     &assets.standard_node,
-                    &assets.pipeline_segment_node,
                     &assets.pipeline_segment_node,
                 },
                 .locked = false,
@@ -327,8 +326,8 @@ pub var location_data = [_]LocationData{
                 .name = "Injection Wells",
                 .markingPictures = &[_]*assets.TAsset{
                     &assets.standard_node,
-                    &assets.p_type_silicon_node,
-                    &assets.n_type_silicon_node,
+                    &assets.injection_walls_1_node,
+                    &assets.injection_walls_2_node,
                     &assets.injection_walls_3_node,
                 },
                 .locked = false,
