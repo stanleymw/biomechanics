@@ -663,6 +663,16 @@ pub fn loop() bool {
             won = true;
             assets.win_sfx.getOrLoad().play();
         }
+
+        rl.drawTextEx(
+            fonts.main_font,
+            "Click to continue...",
+            rl.Vector2.init(10, @floatFromInt(rl.getRenderHeight() - 64)),
+            fonts.Size.Medium,
+            0,
+            rl.Color.white,
+        );
+
         if (gui.imgBtn(
             0.6,
             utils.renderSize().scale(0.5),
