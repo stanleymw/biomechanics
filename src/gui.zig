@@ -216,10 +216,9 @@ pub const PoiPin = struct {
     isLocked: bool = true,
     isCompleted: bool = false,
     location: types.Location,
-    frameCounter: u16 = 0,
-    currentFrame: u16 = 0,
-    fps: u9 = 24,
     frameRect: rl.Rectangle,
+    anim_timer: f32 = 0,
+    currentAnimFrame: i32 = 0,
 
     pub fn init(location: types.Location, x: f32, y: f32, isLocked: bool) PoiPin {
         return PoiPin{
@@ -235,18 +234,16 @@ pub const PoiPin = struct {
     }
     pub fn render(self: *PoiPin, mPos: rl.Vector2) ButtonState {
         var pressed = false;
+
         if (!self.isLocked and !self.isCompleted) {
-            self.frameCounter += 1;
+            self.anim_timer += rl.getFrameTime();
 
-            if (self.frameCounter >= (consts.target_fps / self.fps)) {
-                self.frameCounter = 0;
-                self.currentFrame += 1;
-
-                if (self.currentFrame > 21) self.currentFrame = 0;
-
-                self.frameRect.x = @as(f32, @floatFromInt(self.currentFrame)) * 32;
+            while (self.anim_timer >= 10.0 / @as(f32, @floatFromInt(consts.target_fps))) {
+                self.currentAnimFrame = @rem(self.currentAnimFrame + 1, 21);
+                self.frameRect.x = @as(f32, @floatFromInt(self.currentAnimFrame)) * 32;
+                self.anim_timer -= 10.0 / @as(f32, @floatFromInt(consts.target_fps));
             }
-        } else self.currentFrame = 0;
+        }
 
         const scaledPoint = utils.renderSize().multiply(rl.Vector2.init(self.x, self.y));
 
