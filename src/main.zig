@@ -40,11 +40,13 @@ pub fn main() anyerror!void {
 
     // runtime data
     var startedCutscene = false;
+    var startedEnding = false;
     var finishedAudio1 = false;
     //var finishedAudio2 = false;
     var startTime: ?f64 = null;
     const sound1 = assets.introductionSpeech1.getOrLoad().sound;
     const sound2 = assets.introductionSpeech2.getOrLoad().sound;
+    const ending_speech = assets.endingSpeech.getOrLoad().sound;
 
     var currentScreen: types.Screen = .MainMenu;
     var current_text: *const []const u8 = &"";
@@ -64,15 +66,17 @@ pub fn main() anyerror!void {
     var pois = [_]gui.PoiPin{
         gui.PoiPin.init(.SolarPanels, 0.75, 0.45, false),
         gui.PoiPin.init(.Nuclear, 0.60, 0.65, true),
-        gui.PoiPin.init(.CarbonCapture, 0.44, 0.37, true),
+        gui.PoiPin.init(.CarbonCapture, 0.44, 0.37, false),
     };
 
     const main_music = assets.main_music.getOrLoad();
+    const ending_music = assets.ending_music.getOrLoad();
 
     if (!rl.isMusicStreamPlaying(main_music)) {
         rl.playMusicStream(main_music);
     }
-    rl.setMusicVolume(main_music, 0.5);
+    rl.setMusicVolume(main_music, 0.375);
+    rl.setMusicVolume(ending_music, 0.375);
 
     // Main game loop
     while (!rl.windowShouldClose()) {
@@ -172,7 +176,9 @@ pub fn main() anyerror!void {
                                     if (idx + 1 < pois.len) {
                                         pois[idx + 1].isLocked = false;
                                         std.debug.print("unlocked next poi due to win\n", .{});
-                                    } // else game is complete
+                                    } else {
+                                        currentScreen = .Ending;
+                                    }
 
                                     break;
                                 }
@@ -349,14 +355,77 @@ pub fn main() anyerror!void {
                     }
                 },
                 .Ending => {
-                    rl.drawTextEx(
+                    // rendering bg
+                    const asset = assets.endingCutscene.getOrLoad();
+                    asset.drawEx(
+                        rl.Vector2.zero(),
+                        0,
+                        utils.renderSize().x / @as(f32, @floatFromInt(asset.width)),
+                        rl.Color.white,
+                    );
+
+                    const bounds = rl.measureTextEx(
                         fonts.main_font,
-                        "Game Completed !!\nThanks for playing!!",
-                        utils.renderSize().scale(0.5),
+                        @ptrCast(current_text.*),
                         fonts.Size.Medium,
                         0,
-                        rl.Color.light_gray,
                     );
+
+                    rl.drawRectangleRec(
+                        rl.Rectangle.init(
+                            utils.renderSize().x / 2 - (bounds.x / 2) - consts.tooltip_padding,
+                            utils.renderSize().y / 2 - 100,
+                            bounds.x + (2 * consts.tooltip_padding),
+                            bounds.y,
+                        ),
+                        rl.Color.black,
+                    );
+
+                    rl.drawTextEx(
+                        fonts.main_font,
+                        @ptrCast(current_text.*),
+                        utils.renderSize().scale(0.5).add(utils.v2(-(bounds.x / 2), -100)),
+                        fonts.Size.Medium,
+                        0,
+                        rl.Color.white,
+                    );
+
+                    if (!startedEnding) {
+                        startTime = rl.getTime();
+                        startedEnding = true;
+                        current_text = &"";
+
+                        rl.stopMusicStream(main_music);
+                        rl.playMusicStream(ending_music);
+
+                        continue;
+                    }
+                    rl.updateMusicStream(ending_music);
+
+                    // time since audio started
+                    const time_delta = rl.getTime() - startTime.?;
+
+                    switch (@as(u8, @intFromFloat(time_delta))) {
+                        0...2 => {
+                            if (time_delta >= 2.8 and !rl.isSoundPlaying(ending_speech)) {
+                                rl.playSound(ending_speech);
+                            }
+                        },
+                        3...8 => current_text = &"Aided by your machines, the UN was able to manage the rehabilitation\nof the planet over the next ten years.",
+                        9...13 => current_text = &"The human population has grown steadily,\nas lands and resources have started to be renewed.",
+                        14...17 => current_text = &"Now retired, you sit comfortably,\nwatching over the world which created you",
+                        18...22 => current_text = &"and which you have saved.",
+                        23...27 => current_text = &"",
+                        else => {
+                            currentScreen = .Credits;
+                        },
+                    }
+
+                    //currentScreen = .Globe;
+                },
+                .Credits => {
+                    rl.updateMusicStream(ending_music);
+                    rl.drawText("Credits", 0, 0, fonts.Size.Medium, rl.Color.white);
                 },
             }
 

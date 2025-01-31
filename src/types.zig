@@ -10,6 +10,7 @@ pub const Screen = union(enum) {
     ComponentInfo: Location,
     Info,
     Ending,
+    Credits,
 };
 
 pub const Location = enum(u2) {
