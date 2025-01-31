@@ -66,7 +66,7 @@ pub fn main() anyerror!void {
     var pois = [_]gui.PoiPin{
         gui.PoiPin.init(.SolarPanels, 0.75, 0.45, false),
         gui.PoiPin.init(.Nuclear, 0.60, 0.65, true),
-        gui.PoiPin.init(.CarbonCapture, 0.44, 0.37, false),
+        gui.PoiPin.init(.CarbonCapture, 0.44, 0.37, true),
     };
 
     const main_music = assets.main_music.getOrLoad();
@@ -161,7 +161,10 @@ pub fn main() anyerror!void {
 
                     if (game.loop()) {
                         if (place.level < loc_info.levels.len - 1) {
+                            var location = location_info.location_data[@intFromEnum(place.location)];
+                            location.levels[place.level].solved = true;
                             place.level += 1;
+                            location.levels[place.level].locked = false;
 
                             game.loadLevel(loc_info.levels[place.level]);
                             std.debug.print("loaded: {s} due to win\n", .{loc_info.levels[place.level].name});
@@ -294,54 +297,147 @@ pub fn main() anyerror!void {
                 .LocationInfo => |*location| {
                     rl.updateMusicStream(main_music);
                     if (gui.backBtn(mousePos)) {
-                        currentScreen = .Globe; // .{ .LocationInfo = location.* };
+                        currentScreen = .Globe;
                     }
                     const info = location.getInfo();
-                    const anchor = rl.Vector2.init(190, 75);
+                    const anchor = rl.Vector2.init(150, 75);
                     const tex = info.image_name.getOrLoad();
-                    const tex_h = @as(f32, @floatFromInt(tex.height));
-                    const scale_factor = (utils.renderSize().x - 2 * anchor.x) / @as(f32, @floatFromInt(tex.width));
+                    const scale_factor = (utils.renderSize().x - 2 * anchor.x) / @as(f32, @floatFromInt(tex.width)) * info.image_scale;
 
                     rl.drawTextEx(
                         fonts.main_font,
-                        @ptrCast(info.name),
+                        std.mem.concatWithSentinel(
+                            std.heap.page_allocator,
+                            u8,
+                            &.{ info.name, " Repair" },
+                            0,
+                        ) catch |err| blk: {
+                            std.debug.print("err: {}", .{err});
+                            break :blk @as([*:0]const u8, @ptrCast(info.name));
+                        },
                         anchor,
                         fonts.Size.Medium,
                         0,
                         rl.Color.light_gray,
                     );
+                    const text_info_anchor = anchor.add(utils.yv(fonts.Size.Medium + 5));
+                    rl.drawTextEx(
+                        fonts.main_font,
+                        @ptrCast(info.info),
+                        text_info_anchor,
+                        fonts.Size.Small,
+                        1,
+                        rl.Color.white,
+                    );
+                    const text_size = rl.measureTextEx(
+                        fonts.main_font,
+                        @ptrCast(info.info),
+                        fonts.Size.Small,
+                        1.0,
+                    );
+                    const tex_size = utils.texSize(tex).scale(scale_factor);
                     tex.drawEx(
-                        anchor.add(utils.yv(fonts.Size.Medium)),
+                        rl.Vector2.init(
+                            utils.renderSize().scale(0.5).x - tex_size.scale(0.5).x,
+                            text_info_anchor.y + text_size.y + 5,
+                        ),
                         0.0,
                         scale_factor,
                         rl.Color.white,
                     );
+                    const after_tex = text_info_anchor.add(utils.yv(tex_size.y + text_size.y + 10));
                     if (gui.imgBtn(
-                        1.0,
-                        anchor.add(utils.yv(scale_factor * tex_h + 20)),
-                        assets.continueBtn.getOrLoad(),
-                        assets.continueBtnHover.getOrLoad(),
-                        assets.continueBtnPress.getOrLoad(),
+                        3.0,
+                        rl.Vector2.init(utils.renderSize().scale(0.5).x, after_tex.y + 50),
+                        assets.repairBtn.getOrLoad(),
+                        assets.repairBtnHover.getOrLoad(),
+                        assets.repairBtnPress.getOrLoad(),
                         mousePos,
                     )) {
                         currentScreen = .{ .ComponentInfo = location.* };
                     }
 
                     text_view.setText(info.info);
-                    //text_view.render();
-
-                    // RENDER IMAGE OF MACHINE
                 },
                 .ComponentInfo => |*location| {
                     rl.updateMusicStream(main_music);
                     if (gui.backBtn(mousePos)) {
                         currentScreen = .{ .LocationInfo = location.* };
                     }
+                    const height = 250;
+                    const main_anchor = rl.Vector2.init(100, 100);
+                    rl.drawTextEx(
+                        fonts.main_font,
+                        std.mem.concatWithSentinel(
+                            std.heap.page_allocator,
+                            u8,
+                            &.{ location.getInfo().name, " Repair" },
+                            0,
+                        ) catch |err| blk: {
+                            std.debug.print("err: {}", .{err});
+                            break :blk @as([*:0]const u8, @ptrCast(location.getInfo().name));
+                        },
+                        main_anchor,
+                        fonts.Size.Medium,
+                        1.0,
+                        rl.Color.white,
+                    );
+
                     for (location.getInfo().levels, 0..) |lev, ix| {
-                        if (rg.guiButton(
-                            rl.Rectangle.init(info_anchor.x, info_anchor.y + 600 + @as(f32, @floatFromInt(75 * ix)), 500, 50),
-                            lev.name,
-                        ) == 1) {
+                        const anchor = main_anchor.add(utils.yv(50 + @as(f32, @floatFromInt((height + 20) * ix))));
+                        const bounds = utils.withWH(anchor, utils.renderSize().x * 0.8, height);
+                        rl.drawRectangleLinesEx(
+                            bounds,
+                            5,
+                            rl.Color.white,
+                        );
+                        rl.drawTextEx(
+                            fonts.main_font,
+                            @ptrCast(lev.name),
+                            anchor.addValue(20),
+                            fonts.Size.Medium,
+                            1.0,
+                            rl.Color.white,
+                        );
+                        rl.drawTextEx(
+                            fonts.main_font,
+                            @ptrCast(lev.info),
+                            anchor.add(utils.v2(8, fonts.Size.Medium + 10)),
+                            fonts.Size.Small,
+                            1.0,
+                            rl.Color.white,
+                        );
+                        const img_anchor = anchor.add(utils.v2(750, height / 2));
+                        const tex = lev.texture.getOrLoad();
+
+                        gui.drawTextureCenteredAtPoint(
+                            0.4,
+                            0,
+                            img_anchor,
+                            tex,
+                        );
+
+                        if (lev.locked) {
+                            gui.drawTextureCenteredAtPoint(
+                                2.0,
+                                0,
+                                img_anchor,
+                                assets.lock.getOrLoad(),
+                            );
+                            // assets.lock.getOrLoad().drawEx(
+                            //     img_anchor
+                            //         .add(utils.texSize(tex).scale(0.4).scale(0.5))
+                            //         .subtract(utils
+                            //         .texSize(assets.lock.getOrLoad())
+                            //         .scale(0.5)),
+                            //     0.0,
+                            //     2.0,
+                            //     rl.Color.white,
+                            // );
+                        }
+                        if (lev.solved)
+                            assets.checkmark.getOrLoad().drawEx(img_anchor, 0.0, 1.0, rl.Color.white);
+                        if (!lev.locked and !lev.solved and rl.checkCollisionPointRec(mousePos, bounds) and rl.isMouseButtonPressed(.left)) {
                             std.debug.print("request {s}... and setting loc={s}\n", .{ lev.name, location.getInfo().name });
 
                             game.unloadLevel();

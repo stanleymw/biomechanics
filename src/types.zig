@@ -15,8 +15,8 @@ pub const Screen = union(enum) {
 
 pub const Location = enum(u2) {
     SolarPanels,
-    Nuclear,
     CarbonCapture,
+    Nuclear,
     pub fn getInfo(self: Location) LocationData {
         return location_info.location_data[@intFromEnum(self)];
     }
@@ -42,14 +42,16 @@ pub const LevelData = struct {
     markingPictures: []const *assets.TAsset,
     solved: bool = false,
     locked: bool = true,
+    texture: *assets.TAsset,
+    info: []const u8,
 };
 
 pub const LocationData = struct {
     name: []const u8,
     info: []const u8,
     image_name: *assets.TAsset,
-    levels: []const LevelData,
-    //component_image_names: []const u8,
+    image_scale: f32 = 1.0,
+    levels: []LevelData,
 };
 
 pub const StateBuilder = struct {

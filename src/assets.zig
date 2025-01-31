@@ -90,6 +90,18 @@ pub var gameLogo = TAsset.init("resources/logo.png");
 pub var spaceBg = TAsset.init("resources/space.png");
 pub var playBg = TAsset.init("resources/play-bg.png");
 
+pub var solarComponent0 = TAsset.init("resources/POI/SolarPanel/0/pic.png");
+pub var solarComponent1 = TAsset.init("resources/POI/SolarPanel/1/pic.png");
+pub var solarComponent2 = TAsset.init("resources/POI/SolarPanel/2/pic.png");
+
+pub var nuclearComponent0 = TAsset.init("resources/POI/NuclearReactor/0/pic.png");
+pub var nuclearComponent1 = TAsset.init("resources/POI/NuclearReactor/1/pic.png");
+pub var nuclearComponent2 = TAsset.init("resources/POI/NuclearReactor/2/pic.png");
+
+pub var carbonComponent0 = TAsset.init("resources/POI/CarbonCapture/0/pic.png");
+pub var carbonComponent1 = TAsset.init("resources/POI/CarbonCapture/1/pic.png");
+pub var carbonComponent2 = TAsset.init("resources/POI/CarbonCapture/2/pic.png");
+
 pub var desertCutscene = TAsset.init("resources/cutscenes/desert.png");
 pub var labCutscene = TAsset.init("resources/cutscenes/lab.png");
 pub var endingCutscene = TAsset.init("resources/cutscenes/ending.png");
@@ -102,6 +114,7 @@ pub var nuclearMachine = TAsset.init("resources/POI/NuclearReactor/machine.png")
 pub var carbonMachine = TAsset.init("resources/POI/CarbonCapture/machine.png");
 
 pub var backBtn = TAsset.init("resources/back-btn.png");
+pub var backBtnHover = TAsset.init("resources/back-btn-hover.png");
 pub var checkmark = TAsset.init("resources/checkmark.png");
 pub var lock = TAsset.init("resources/lock.png");
 
@@ -112,6 +125,10 @@ pub var playBtnPress = TAsset.init("resources/play-btn-press.png");
 pub var continueBtn = TAsset.init("resources/continue-btn.png");
 pub var continueBtnHover = TAsset.init("resources/continue-btn-hover.png");
 pub var continueBtnPress = TAsset.init("resources/continue-btn-pressed.png");
+
+pub var repairBtn = TAsset.init("resources/repair-btn.png");
+pub var repairBtnHover = TAsset.init("resources/repair-btn-hover.png");
+pub var repairBtnPress = TAsset.init("resources/repair-btn-press.png");
 
 pub var standard_node = TAsset.init("resources/POI/standard-node.png");
 
@@ -144,6 +161,18 @@ pub var assetPool = AssetPool(rl.Texture).init(&.{
     &spaceBg,
     &playBg,
 
+    &solarComponent0,
+    &solarComponent1,
+    &solarComponent2,
+
+    &nuclearComponent0,
+    &nuclearComponent1,
+    &nuclearComponent2,
+
+    &carbonComponent0,
+    &carbonComponent1,
+    &carbonComponent2,
+
     &desertCutscene,
     &labCutscene,
     &endingCutscene,
@@ -156,6 +185,7 @@ pub var assetPool = AssetPool(rl.Texture).init(&.{
     &carbonMachine,
 
     &backBtn,
+    &backBtnHover,
     &checkmark,
     &lock,
 
@@ -166,6 +196,10 @@ pub var assetPool = AssetPool(rl.Texture).init(&.{
     &continueBtn,
     &continueBtnHover,
     &continueBtnPress,
+
+    &repairBtn,
+    &repairBtnHover,
+    &repairBtnPress,
 
     &standard_node,
 
