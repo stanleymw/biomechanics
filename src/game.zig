@@ -21,6 +21,8 @@ pub fn levelUnloaded() bool {
     return !level_loaded;
 }
 
+var won = false;
+
 pub fn loadLevel(level: types.LevelData) void {
     level_loaded = true;
     Level = level;
@@ -28,6 +30,7 @@ pub fn loadLevel(level: types.LevelData) void {
 
 pub fn unloadLevel() void {
     level_loaded = false;
+    won = false;
 }
 
 fn isSameSizeAsTargetStateWire(typ: Direction, idx: usize) bool {
@@ -656,6 +659,10 @@ pub fn loop() bool {
     }
 
     if (rl.isKeyDown(.right_bracket) or hasWon()) {
+        if (!won) {
+            won = true;
+            assets.win_sfx.getOrLoad().play();
+        }
         if (gui.imgBtn(
             0.6,
             utils.renderSize().scale(0.5),
@@ -664,8 +671,11 @@ pub fn loop() bool {
             null,
             rl.getMousePosition(),
         )) {
+            won = false;
             return true;
         }
+    } else {
+        won = false;
     }
     return false;
 }

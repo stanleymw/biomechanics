@@ -194,6 +194,7 @@ pub var endingSpeech = SAsset.init("resources/audio/ending.ogg");
 
 pub var click_sfx = SAsset.init("resources/sfx/click.mp3");
 pub var slide_sfx = SAsset.init("resources/sfx/slide.mp3");
+pub var win_sfx = SAsset.init("resources/sfx/win.mp3");
 
 pub var ending_music = MAsset.init("resources/music/reflected-light.ogg");
 pub var main_music = MAsset.init("resources/music/whispers-of-tranquility.ogg");
@@ -205,6 +206,7 @@ pub var soundPool = AssetPool(SoundWrapper).init(&.{
 
     &click_sfx,
     &slide_sfx,
+    &win_sfx,
 });
 
 pub var musicPool = AssetPool(rl.Music).init(&.{
