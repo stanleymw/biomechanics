@@ -130,17 +130,38 @@ pub var location_data = [_]LocationData{
         .levels = &[_]LevelData{
             LevelData{
                 .vertical_wires = &[_]u8{},
-                .horizontal_wires = &[_]u8{},
-                .diag_up_wires = &[_]u8{ 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 },
-                .diag_down_wires = &[_]u8{ 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 },
+                .horizontal_wires = &[_]u8{ 4, 7, 10 },
+                .diag_up_wires = &[_]u8{ 9, 12, 18 },
+                .diag_down_wires = &[_]u8{ 10, 16, 19 },
                 .state = StateBuilder
                     .empty()
+                    .hLine(5, 9, 4, 0)
+                    .hLine(2, 5, 7, 0)
+                    .diagUpLine(7, 2, 3, 0)
+                    .diagDownLine(10, 5, 3, 0)
+                    .diagUpLine(10, 8, 3, 0)
+                    .diagDownLine(7, 11, 3, 0)
+                    .diagUpLine(6, 6, 3, 0)
+                    .diagDownLine(10, 8, 3, 0)
+                    .hLine(5, 9, 10, 0)
+                    .point(5, 10, 1)
+                    .point(5, 4, 1)
+                    .point(11, 7, 1)
                     .build(),
                 .target_state = StateBuilder
                     .empty()
-                    .box(6, 6, 8, 8, 0)
+                    .hLine(5, 9, 4, 0)
+                    .hLine(2, 5, 7, 0)
+                    .diagUpLine(7, 2, 3, 0)
+                    .diagDownLine(10, 5, 3, 0)
+                    .diagUpLine(10, 8, 3, 0)
+                    .diagDownLine(7, 11, 3, 0)
+                    .diagUpLine(6, 6, 3, 0)
+                    .diagDownLine(10, 8, 3, 0)
+                    .hLine(5, 9, 10, 0)
+                    .point(4, 7, 1)
+                    .point(6, 8, 1)
                     .point(6, 6, 1)
-                    .point(6, 7, 2)
                     .build(),
                 .name = "Nuclear Core",
                 .markingPictures = &[_]*assets.TAsset{
@@ -221,19 +242,28 @@ pub var location_data = [_]LocationData{
         .levels = &[_]LevelData{
             LevelData{
                 .vertical_wires = &[_]u8{},
-                .horizontal_wires = &[_]u8{},
-                .diag_up_wires = &[_]u8{ 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 },
-                .diag_down_wires = &[_]u8{ 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 },
+                .horizontal_wires = &[_]u8{ 6, 10 },
+                .diag_up_wires = &[_]u8{ 12, 18 },
+                .diag_down_wires = &[_]u8{ 12, 18 },
                 .state = StateBuilder
                     .empty()
-                    .hLine(7, 9, 7, 0)
-                    .hLine(7, 9, 9, 0)
+                    .hLine(6, 9, 6, 0)
+                    .hLine(6, 9, 10, 0)
+                    .point(9, 9, 0)
+                    .point(5, 9, 0)
+                    .diagDownLine(8, 10, 2, 0)
+                    .diagUpLine(8, 4, 2, 0)
+                    .point(10, 8, 1)
                     .build(),
                 .target_state = StateBuilder
                     .empty()
-                    .box(6, 6, 8, 8, 0)
-                    .point(6, 6, 1)
-                    .point(6, 7, 2)
+                    .hLine(6, 9, 6, 0)
+                    .hLine(6, 9, 10, 0)
+                    .point(9, 9, 0)
+                    .point(5, 9, 0)
+                    .diagDownLine(8, 10, 2, 0)
+                    .diagUpLine(8, 4, 2, 0)
+                    .point(4, 8, 1)
                     .build(),
                 .name = "Capture Unit",
                 .markingPictures = &[_]*assets.TAsset{
@@ -244,34 +274,31 @@ pub var location_data = [_]LocationData{
                 .locked = false,
             },
             LevelData{
-                .vertical_wires = &[_]u8{ 5, 7, 9 },
+                .vertical_wires = &[_]u8{},
                 .horizontal_wires = &[_]u8{7},
-                .diag_up_wires = &[_]u8{},
-                .diag_down_wires = &[_]u8{},
+                .diag_up_wires = &[_]u8{14},
+                .diag_down_wires = &[_]u8{14},
                 .state = StateBuilder
                     .empty()
-                    .vLine(5, 5, 8, 0)
-                    .vLine(7, 5, 8, 0)
-                    .vLine(9, 5, 8, 0)
-                    .hLine(4, 11, 7, 0)
-                    .point(5, 8, 1)
-                    .point(7, 8, 1)
-                    .point(9, 8, 1)
+                    .hLine(5, 10, 7, 0)
+                    .diagUpLine(9, 5, 4, 0)
+                    .diagDownLine(9, 9, 4, 0)
+                    .point(8, 7, 1)
+                    .point(9, 7, 2)
                     .build(),
                 .target_state = StateBuilder
                     .empty()
-                    .vLine(5, 6, 9, 0)
-                    .vLine(7, 6, 9, 0)
-                    .vLine(9, 6, 9, 0)
-                    .hLine(4, 11, 7, 0)
+                    .hLine(5, 10, 7, 0)
+                    .diagUpLine(9, 5, 4, 0)
+                    .diagDownLine(9, 9, 4, 0)
                     .point(5, 9, 1)
-                    .point(7, 9, 1)
-                    .point(9, 9, 1)
+                    .point(9, 9, 2)
                     .build(),
                 .name = "Transport",
                 .markingPictures = &[_]*assets.TAsset{
                     &assets.standard_node,
                     &assets.n_type_silicon_node,
+                    &assets.p_type_silicon_node,
                 },
                 .locked = false,
             },

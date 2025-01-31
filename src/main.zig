@@ -63,7 +63,7 @@ pub fn main() anyerror!void {
     var pois = [_]gui.PoiPin{
         gui.PoiPin.init(.SolarPanels, 0.75, 0.45, false),
         gui.PoiPin.init(.Nuclear, 0.60, 0.65, false),
-        gui.PoiPin.init(.CarbonCapture, 0.44, 0.37, true),
+        gui.PoiPin.init(.CarbonCapture, 0.44, 0.37, false),
     };
 
     // Main game loop

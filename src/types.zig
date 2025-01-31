@@ -82,13 +82,13 @@ pub const StateBuilder = struct {
         return fromState(state);
     }
 
-    /// Draws a diagonal line from state[x1][y1] to state[x2][y2]. The two points MUST BE COLINEAR. That is, |y2-y1| == |x2-x1|. x1 must be the lower point
-    pub fn diagDownLine(self: StateBuilder, x1: u8, y1: u8, x2: u8, marking: u8) StateBuilder {
+    /// Draws a diagonal line starting at state[r][c] with specified len
+    pub fn diagDownLine(self: StateBuilder, r: usize, c: usize, len: usize, marking: u8) StateBuilder {
         var state = self.state;
 
-        var cx: usize = @intCast(x1);
-        var cy: usize = @intCast(y1);
-        for (0..@abs(x2 - x1)) |_| {
+        var cx: usize = r;
+        var cy: usize = c;
+        for (0..len) |_| {
             state[cx][cy] = .{ .marking = marking };
             cx -= 1;
             cy -= 1;
@@ -97,13 +97,13 @@ pub const StateBuilder = struct {
         return fromState(state);
     }
 
-    /// Draws a diagonal line from state[x1][y1] to state[x2][y2]. The two points MUST BE COLINEAR. That is, |y2-y1| == |x2-x1|. x1 must be the lower point
-    pub fn diagUpLine(self: StateBuilder, x1: u8, y1: u8, x2: u8, marking: u8) StateBuilder {
+    /// Draws a diagonal line starting at state[r][c] with specified len
+    pub fn diagUpLine(self: StateBuilder, r: usize, c: usize, len: usize, marking: u8) StateBuilder {
         var state = self.state;
 
-        var cx: usize = @intCast(x1);
-        var cy: usize = @intCast(y1);
-        for (0..@abs(x2 - x1)) |_| {
+        var cx = r;
+        var cy = c;
+        for (0..len) |_| {
             state[cx][cy] = .{ .marking = marking };
             cx -= 1;
             cy += 1;

@@ -220,13 +220,16 @@ fn isContiguous(typ: Direction, idx: usize) bool {
             var tracking = false;
             var left = false;
 
+            std.debug.print("START: xc={}, yc={} for idx={}\n", .{ xc, yc, idx });
             for (0..diag_len - 1) |_| {
                 if (Level.state[xc][yc]) |_| {
+                    std.debug.print("{} @ {},{}\n", .{ Level.state[xc][yc].?.marking, xc, yc });
                     tracking = true;
                     if (left) {
                         return false;
                     }
                 } else {
+                    std.debug.print("null @ {},{}\n", .{ xc, yc });
                     if (tracking) {
                         left = true;
                     }
@@ -599,10 +602,10 @@ pub fn loop() bool {
             selectedIndex = @mod(selectedIndex, directionToWires(cursorState).len);
 
             if (rl.isKeyPressed(.right)) {
-                shiftDiagDown(Level.diag_up_wires[selectedIndex] + 1, -1);
+                shiftDiagDown(Level.diag_down_wires[selectedIndex] + 1, -1);
             }
             if (rl.isKeyPressed(.left)) {
-                shiftDiagDown(Level.diag_up_wires[selectedIndex] + 1, 1);
+                shiftDiagDown(Level.diag_down_wires[selectedIndex] + 1, 1);
             }
         },
     }
