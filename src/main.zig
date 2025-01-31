@@ -42,9 +42,17 @@ pub fn main() anyerror!void {
     var startedCutscene = false;
     var startedEnding = false;
     var finishedAudio1 = false;
+
     //var finishedAudio2 = false;
     var startTime: ?f64 = null;
     const ending_speech = assets.endingSpeech.getOrLoad().sound;
+
+    var tut_anim_timer: f32 = 0;
+    var animFrames: i32 = 0;
+    const tutorialAnim = rl.loadImageAnim("resources/tutorial.gif", &animFrames);
+    const tut_tex = rl.loadTextureFromImage(tutorialAnim);
+    var nextFrameDataOffset: usize = 0;
+    var currentAnimFrame: i32 = 0;
 
     var currentScreen: types.Screen = .MainMenu;
     var current_text: *const []const u8 = &"";
@@ -263,7 +271,7 @@ pub fn main() anyerror!void {
                             startTime = rl.getTime();
                         } else {
                             rl.stopSound(sound2);
-                            currentScreen = .Globe;
+                            currentScreen = .Tutorial;
                         }
                     }
                     if (!finishedAudio1 and time_delta > 16.5) {
@@ -273,7 +281,7 @@ pub fn main() anyerror!void {
                     }
                     if (finishedAudio1 and time_delta > 26.5) {
                         rl.stopSound(sound2);
-                        currentScreen = .Globe;
+                        currentScreen = .Tutorial;
                     }
 
                     // if (!(finishedAudio1 or rl.isSoundPlaying(sound1))) {
@@ -291,6 +299,34 @@ pub fn main() anyerror!void {
                     // }
 
                     //currentScreen = .Globe;
+                },
+                .Tutorial => {
+                    tut_anim_timer += rl.getFrameTime();
+                    while (tut_anim_timer >= 3) {
+                        currentAnimFrame = @rem(currentAnimFrame + 1, animFrames);
+                        nextFrameDataOffset = 4 * @as(u32, @intCast(tutorialAnim.width * tutorialAnim.height * currentAnimFrame));
+                        rl.updateTexture(tut_tex, @ptrFromInt(@as(usize, @intFromPtr(tutorialAnim.data)) + nextFrameDataOffset));
+                        tut_anim_timer -= 3;
+                    }
+                    rl.drawTextureEx(
+                        tut_tex,
+                        rl.Vector2.zero(),
+                        0,
+                        3.375,
+                        rl.Color.white,
+                    );
+                    rl.drawTextEx(
+                        fonts.main_font,
+                        "Press to exit tutorial",
+                        rl.Vector2.init(10, @floatFromInt(rl.getRenderHeight() - 64)),
+                        fonts.Size.Medium,
+                        0,
+                        rl.Color.white,
+                    );
+                    if (rl.isMouseButtonPressed(.left)) {
+                        rl.unloadImage(tutorialAnim);
+                        currentScreen = .Globe;
+                    }
                 },
                 .LocationInfo => |*location| {
                     rl.updateMusicStream(main_music);
