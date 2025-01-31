@@ -36,6 +36,7 @@ pub fn main() anyerror!void {
     // Textures unloading (assets are lazily loaded)
     defer assets.assetPool.deinitAll();
     defer assets.soundPool.deinitAll();
+    defer assets.musicPool.deinitAll();
 
     // runtime data
     var startedCutscene = false;
@@ -62,9 +63,16 @@ pub fn main() anyerror!void {
 
     var pois = [_]gui.PoiPin{
         gui.PoiPin.init(.SolarPanels, 0.75, 0.45, false),
-        gui.PoiPin.init(.Nuclear, 0.60, 0.65, false),
-        gui.PoiPin.init(.CarbonCapture, 0.44, 0.37, false),
+        gui.PoiPin.init(.Nuclear, 0.60, 0.65, true),
+        gui.PoiPin.init(.CarbonCapture, 0.44, 0.37, true),
     };
+
+    const main_music = assets.main_music.getOrLoad();
+
+    if (!rl.isMusicStreamPlaying(main_music)) {
+        rl.playMusicStream(main_music);
+    }
+    rl.setMusicVolume(main_music, 0.5);
 
     // Main game loop
     while (!rl.windowShouldClose()) {
@@ -77,6 +85,7 @@ pub fn main() anyerror!void {
 
             switch (currentScreen) {
                 .MainMenu => {
+                    rl.updateMusicStream(main_music);
                     const anchor = rl.Vector2.init(@as(f32, @floatFromInt(rl.getScreenWidth())) / 2.0, 300);
                     gui.drawTextureCenteredAtPoint(0.8, 0.0, anchor, assets.gameLogo.getOrLoad());
                     if (gui.imgBtn(
@@ -91,6 +100,7 @@ pub fn main() anyerror!void {
                     }
                 },
                 .Globe => {
+                    rl.updateMusicStream(main_music);
                     gui.drawTextureCentered(8.435, 0, assets.spaceBg.getOrLoad());
                     gui.drawTextureCentered(8.0, 0, assets.globeTexture.getOrLoad());
                     var location: ?types.Location = null;
@@ -129,6 +139,7 @@ pub fn main() anyerror!void {
                     }
                 },
                 .Play => |*place| {
+                    rl.updateMusicStream(main_music);
                     gui.drawTextureCentered(0.8, 0, assets.playBg.getOrLoad());
 
                     const loc_real = place.location;
@@ -275,6 +286,7 @@ pub fn main() anyerror!void {
                     //currentScreen = .Globe;
                 },
                 .LocationInfo => |*location| {
+                    rl.updateMusicStream(main_music);
                     if (gui.backBtn(mousePos)) {
                         currentScreen = .Globe; // .{ .LocationInfo = location.* };
                     }
@@ -315,6 +327,7 @@ pub fn main() anyerror!void {
                     // RENDER IMAGE OF MACHINE
                 },
                 .ComponentInfo => |*location| {
+                    rl.updateMusicStream(main_music);
                     if (gui.backBtn(mousePos)) {
                         currentScreen = .{ .LocationInfo = location.* };
                     }

@@ -129,6 +129,71 @@ pub var location_data = [_]LocationData{
         .image_name = &assets.nuclearMachine,
         .levels = &[_]LevelData{
             LevelData{
+                .vertical_wires = &[_]u8{ 5, 7, 9 },
+                .horizontal_wires = &[_]u8{7},
+                .diag_up_wires = &[_]u8{},
+                .diag_down_wires = &[_]u8{},
+                .state = StateBuilder
+                    .empty()
+                    .vLine(5, 5, 8, 0)
+                    .vLine(7, 5, 8, 0)
+                    .vLine(9, 5, 8, 0)
+                    .hLine(4, 8, 7, 2)
+                    .point(8, 7, 0)
+                    .hLine(9, 11, 7, 2)
+                    .point(5, 8, 1)
+                    .point(7, 8, 1)
+                    .point(9, 8, 1)
+                    .build(),
+                .target_state = StateBuilder
+                    .empty()
+                    .vLine(5, 6, 9, 0)
+                    .vLine(7, 6, 9, 0)
+                    .vLine(9, 6, 9, 0)
+                    .hLine(4, 8, 7, 2)
+                    .point(8, 7, 0)
+                    .hLine(9, 11, 7, 2)
+                    .point(5, 9, 1)
+                    .point(7, 9, 1)
+                    .point(9, 9, 1)
+                    .build(),
+                .name = "Steam Generator",
+                .markingPictures = &[_]*assets.TAsset{
+                    &assets.standard_node,
+                    &assets.steam_plate_node,
+                    &assets.columns_node,
+                },
+                .locked = false,
+            },
+            LevelData{
+                .vertical_wires = &[_]u8{7},
+                .horizontal_wires = &[_]u8{ 6, 7 },
+                .diag_up_wires = &[_]u8{},
+                .diag_down_wires = &[_]u8{},
+                .state = StateBuilder
+                    .empty()
+                    .hLine(5, 11, 6, 0)
+                    .hLine(5, 11, 7, 0)
+                    .point(7, 5, 0)
+                    .hLine(8, 11, 6, 1)
+                    .hLine(5, 8, 7, 1)
+                    .build(),
+                .target_state = StateBuilder
+                    .empty()
+                    .hLine(5, 11, 6, 0)
+                    .hLine(5, 11, 7, 0)
+                    .point(7, 5, 0)
+                    .hLine(5, 8, 6, 1)
+                    .hLine(8, 11, 7, 1)
+                    .build(),
+                .name = "Control Rods",
+                .markingPictures = &[_]*assets.TAsset{
+                    &assets.standard_node,
+                    &assets.control_rod_node,
+                },
+                .locked = false,
+            },
+            LevelData{
                 .vertical_wires = &[_]u8{},
                 .horizontal_wires = &[_]u8{ 4, 7, 10 },
                 .diag_up_wires = &[_]u8{ 9, 12, 18 },
@@ -169,67 +234,6 @@ pub var location_data = [_]LocationData{
                     &assets.absorber_1_node,
                     &assets.absorber_2_node,
                     &assets.absorber_3_node,
-                },
-                .locked = false,
-            },
-            LevelData{
-                .vertical_wires = &[_]u8{ 5, 7, 9 },
-                .horizontal_wires = &[_]u8{7},
-                .diag_up_wires = &[_]u8{},
-                .diag_down_wires = &[_]u8{},
-                .state = StateBuilder
-                    .empty()
-                    .vLine(5, 5, 8, 0)
-                    .vLine(7, 5, 8, 0)
-                    .vLine(9, 5, 8, 0)
-                    .hLine(4, 11, 7, 0)
-                    .point(5, 8, 1)
-                    .point(7, 8, 1)
-                    .point(9, 8, 1)
-                    .build(),
-                .target_state = StateBuilder
-                    .empty()
-                    .vLine(5, 6, 9, 0)
-                    .vLine(7, 6, 9, 0)
-                    .vLine(9, 6, 9, 0)
-                    .hLine(4, 11, 7, 0)
-                    .point(5, 9, 1)
-                    .point(7, 9, 1)
-                    .point(9, 9, 1)
-                    .build(),
-                .name = "Steam Generator",
-                .markingPictures = &[_]*assets.TAsset{
-                    &assets.standard_node,
-                    &assets.steam_plate_node,
-                    &assets.columns_node,
-                },
-                .locked = false,
-            },
-            LevelData{
-                .vertical_wires = &[_]u8{7},
-                .horizontal_wires = &[_]u8{ 6, 7 },
-                .diag_up_wires = &[_]u8{},
-                .diag_down_wires = &[_]u8{},
-                .state = StateBuilder
-                    .empty()
-                    .hLine(5, 11, 6, 0)
-                    .hLine(5, 11, 7, 0)
-                    .point(7, 5, 0)
-                    .hLine(8, 11, 6, 1)
-                    .hLine(5, 8, 7, 1)
-                    .build(),
-                .target_state = StateBuilder
-                    .empty()
-                    .hLine(5, 11, 6, 0)
-                    .hLine(5, 11, 7, 0)
-                    .point(7, 5, 0)
-                    .hLine(5, 8, 6, 1)
-                    .hLine(8, 11, 7, 1)
-                    .build(),
-                .name = "Control Rods",
-                .markingPictures = &[_]*assets.TAsset{
-                    &assets.standard_node,
-                    &assets.control_rod_node,
                 },
                 .locked = false,
             },
