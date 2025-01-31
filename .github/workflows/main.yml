@@ -12,6 +12,9 @@ jobs:
       - uses: mlugg/setup-zig@v1
         with:
           version: latest
+      - uses: mymindstorm/setup-emsdk@v14
+      - run: emcc -v
+      - run: whereis emcc
       - run: zig build
       - uses: actions/upload-artifact@v4.6.0
         with:
