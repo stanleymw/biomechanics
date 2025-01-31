@@ -108,6 +108,19 @@ pub var p_type_silicon_node = TAsset.init("resources/POI/SolarPanel/Nodes/1.png"
 pub var sealant_node = TAsset.init("resources/POI/SolarPanel/Nodes/2.png");
 pub var screw_node = TAsset.init("resources/POI/SolarPanel/Nodes/3.png");
 
+pub var absorber_1_node = TAsset.init("resources/POI/NuclearReactor/Nodes/absorber-1.png");
+pub var absorber_2_node = TAsset.init("resources/POI/NuclearReactor/Nodes/absorber-2.png");
+pub var absorber_3_node = TAsset.init("resources/POI/NuclearReactor/Nodes/absorber-3.png");
+pub var control_rod_node = TAsset.init("resources/POI/NuclearReactor/Nodes/control-rod.png");
+pub var steam_plate_node = TAsset.init("resources/POI/NuclearReactor/Nodes/steam-plate.png");
+pub var columns_node = TAsset.init("resources/POI/NuclearReactor/Nodes/columns.png");
+
+pub var injection_walls_1_node = TAsset.init("resources/POI/CarbonCapture/Nodes/injection-walls-1.png");
+pub var injection_walls_2_node = TAsset.init("resources/POI/CarbonCapture/Nodes/injection-walls-2.png");
+pub var injection_walls_3_node = TAsset.init("resources/POI/CarbonCapture/Nodes/injection-walls-3.png");
+pub var pipeline_segment_node = TAsset.init("resources/POI/CarbonCapture/Nodes/pipeline-segment.png");
+pub var solvent_node = TAsset.init("resources/POI/CarbonCapture/Nodes/solvent.png");
+
 pub var assetPool = AssetPool(rl.Texture).init(&.{
     &poiPinTex,
     &poiPinLockedTex,
@@ -148,6 +161,19 @@ pub var assetPool = AssetPool(rl.Texture).init(&.{
     &p_type_silicon_node,
     &sealant_node,
     &screw_node,
+
+    &absorber_1_node,
+    &absorber_2_node,
+    &absorber_3_node,
+    &control_rod_node,
+    &steam_plate_node,
+    &columns_node,
+
+    &injection_walls_1_node,
+    &injection_walls_2_node,
+    &injection_walls_3_node,
+    &pipeline_segment_node,
+    &solvent_node,
 });
 
 pub var introductionSpeech1 = SAsset.init("resources/audio/intro1.ogg");

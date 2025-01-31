@@ -145,8 +145,8 @@ pub var location_data = [_]LocationData{
                     .diagDownLine(10, 8, 3, 0)
                     .hLine(5, 9, 10, 0)
                     .point(5, 10, 1)
-                    .point(5, 4, 1)
-                    .point(11, 7, 1)
+                    .point(5, 4, 2)
+                    .point(11, 7, 3)
                     .build(),
                 .target_state = StateBuilder
                     .empty()
@@ -160,14 +160,15 @@ pub var location_data = [_]LocationData{
                     .diagDownLine(10, 8, 3, 0)
                     .hLine(5, 9, 10, 0)
                     .point(4, 7, 1)
-                    .point(6, 8, 1)
-                    .point(6, 6, 1)
+                    .point(6, 8, 2)
+                    .point(6, 6, 3)
                     .build(),
                 .name = "Nuclear Core",
                 .markingPictures = &[_]*assets.TAsset{
                     &assets.standard_node,
-                    &assets.n_type_silicon_node,
-                    &assets.p_type_silicon_node,
+                    &assets.absorber_1_node,
+                    &assets.absorber_2_node,
+                    &assets.absorber_3_node,
                 },
                 .locked = false,
             },
@@ -199,7 +200,8 @@ pub var location_data = [_]LocationData{
                 .name = "Steam Generator",
                 .markingPictures = &[_]*assets.TAsset{
                     &assets.standard_node,
-                    &assets.n_type_silicon_node,
+                    &assets.steam_plate_node,
+                    &assets.columns_node,
                 },
                 .locked = false,
             },
@@ -227,8 +229,7 @@ pub var location_data = [_]LocationData{
                 .name = "Control Rods",
                 .markingPictures = &[_]*assets.TAsset{
                     &assets.standard_node,
-                    &assets.n_type_silicon_node,
-                    &assets.p_type_silicon_node,
+                    &assets.control_rod_node,
                 },
                 .locked = false,
             },
@@ -268,8 +269,7 @@ pub var location_data = [_]LocationData{
                 .name = "Capture Unit",
                 .markingPictures = &[_]*assets.TAsset{
                     &assets.standard_node,
-                    &assets.n_type_silicon_node,
-                    &assets.p_type_silicon_node,
+                    &assets.solvent_node,
                 },
                 .locked = false,
             },
@@ -297,37 +297,39 @@ pub var location_data = [_]LocationData{
                 .name = "Transport",
                 .markingPictures = &[_]*assets.TAsset{
                     &assets.standard_node,
-                    &assets.n_type_silicon_node,
-                    &assets.p_type_silicon_node,
+                    &assets.pipeline_segment_node,
+                    &assets.pipeline_segment_node,
                 },
                 .locked = false,
             },
             LevelData{
-                .vertical_wires = &[_]u8{7},
-                .horizontal_wires = &[_]u8{ 6, 7 },
-                .diag_up_wires = &[_]u8{},
-                .diag_down_wires = &[_]u8{},
+                .vertical_wires = &[_]u8{},
+                .horizontal_wires = &[_]u8{8},
+                .diag_up_wires = &[_]u8{13},
+                .diag_down_wires = &[_]u8{13},
                 .state = StateBuilder
                     .empty()
-                    .hLine(5, 11, 6, 0)
-                    .hLine(5, 11, 7, 0)
-                    .point(7, 5, 0)
-                    .hLine(8, 11, 6, 1)
-                    .hLine(5, 8, 7, 1)
+                    .hLine(5, 10, 8, 0)
+                    .point(7, 6, 0)
+                    .point(6, 7, 1)
+                    .point(8, 7, 2)
+                    .point(7, 8, 3)
                     .build(),
                 .target_state = StateBuilder
                     .empty()
-                    .hLine(5, 11, 6, 0)
-                    .hLine(5, 11, 7, 0)
-                    .point(7, 5, 0)
-                    .hLine(5, 8, 6, 1)
-                    .hLine(8, 11, 7, 1)
+                    .hLine(5, 10, 8, 0)
+                    .point(7, 6, 1)
+                    .point(6, 7, 0)
+                    .point(8, 7, 0)
+                    .point(5, 8, 3)
+                    .point(9, 8, 2)
                     .build(),
                 .name = "Injection Wells",
                 .markingPictures = &[_]*assets.TAsset{
                     &assets.standard_node,
-                    &assets.n_type_silicon_node,
                     &assets.p_type_silicon_node,
+                    &assets.n_type_silicon_node,
+                    &assets.injection_walls_3_node,
                 },
                 .locked = false,
             },
