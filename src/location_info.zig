@@ -178,7 +178,7 @@ pub var nuclear_levels = [_]LevelData{
         \\ these rods regulate the fission reaction by adjusting
         \\ neutron flux.
         ,
-        .locked = false,
+        .locked = true,
     },
     LevelData{
         .vertical_wires = &[_]u8{},
@@ -228,7 +228,7 @@ pub var nuclear_levels = [_]LevelData{
         \\ typically uranium-235 or plutonium-239, where nuclear
         \\ fission occurs.
         ,
-        .locked = false,
+        .locked = true,
     },
 };
 
@@ -303,7 +303,7 @@ pub var carbon_levels = [_]LevelData{
         \\ most common method for large-scale carbon deoxide
         \\ transport.
         ,
-        .locked = false,
+        .locked = true,
     },
     LevelData{
         .vertical_wires = &[_]u8{},
@@ -340,7 +340,7 @@ pub var carbon_levels = [_]LevelData{
         \\ geological formations, such as depleted oil and gas
         \\ fields or deep saline aquifers, for long-term storage.
         ,
-        .locked = false,
+        .locked = true,
     },
 };
 
