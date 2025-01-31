@@ -274,6 +274,8 @@ fn shiftColumn(idx: usize, amount: i32) void {
             Level.state[x][idx] = null;
         }
     }
+
+    assets.slide_sfx.getOrLoad().play();
 }
 
 fn shiftDiagDown(idx: usize, amount: i32) void {
@@ -331,6 +333,8 @@ fn shiftDiagDown(idx: usize, amount: i32) void {
             yc += 1;
         }
     }
+
+    assets.slide_sfx.getOrLoad().play();
 }
 
 fn shiftDiagUp(idx: usize, amount: i32) void {
@@ -385,6 +389,8 @@ fn shiftDiagUp(idx: usize, amount: i32) void {
             yc += 1;
         }
     }
+
+    assets.slide_sfx.getOrLoad().play();
 }
 
 fn shiftRow(idx: usize, amount: i32) void {
@@ -417,6 +423,8 @@ fn shiftRow(idx: usize, amount: i32) void {
             Level.state[idx][x] = null;
         }
     }
+
+    assets.slide_sfx.getOrLoad().play();
 }
 
 var block_size: i32 = 0;

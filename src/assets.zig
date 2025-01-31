@@ -177,11 +177,18 @@ pub var assetPool = AssetPool(rl.Texture).init(&.{
 });
 
 pub var introductionSpeech1 = SAsset.init("resources/audio/intro1.ogg");
+
 pub var introductionSpeech2 = SAsset.init("resources/audio/intro2.ogg");
 pub var endingSpeech = SAsset.init("resources/audio/ending.ogg");
+
+pub var click_sfx = SAsset.init("resources/sfx/click.mp3");
+pub var slide_sfx = SAsset.init("resources/sfx/slide.mp3");
 
 pub var soundPool = AssetPool(SoundWrapper).init(&.{
     &introductionSpeech1,
     &introductionSpeech2,
     &endingSpeech,
+
+    &click_sfx,
+    &slide_sfx,
 });

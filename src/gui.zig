@@ -89,6 +89,10 @@ pub fn imgBtn(
         scaleFactor,
         rl.Color.white,
     );
+
+    if (pressed) {
+        assets.click_sfx.getOrLoad().play();
+    }
     return pressed;
 }
 
@@ -259,7 +263,11 @@ pub const PoiPin = struct {
         } else {
             drawTextureProCenteredAtPoint(4.0, 0.0, scaledPoint, assets.poiPinTex.getOrLoad(), self.frameRect);
         }
-
-        return if (pressed) .Pressed else .Regular;
+        if (pressed) {
+            assets.click_sfx.getOrLoad().play();
+            return .Pressed;
+        } else {
+            return .Regular;
+        }
     }
 };
