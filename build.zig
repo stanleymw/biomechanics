@@ -16,7 +16,7 @@ pub fn build(b: *std.Build) !void {
 
     //web exports are completely separate
     if (target.query.os_tag == .emscripten) {
-        const exe_lib = try rlz.emcc.compileForEmscripten(b, "Project", "src/main.zig", target, optimize);
+        const exe_lib = try rlz.emcc.compileForEmscripten(b, "BioMechanics", "src/main.zig", target, optimize);
 
         exe_lib.linkLibrary(raylib_artifact);
         exe_lib.root_module.addImport("raylib", raylib);
@@ -33,22 +33,40 @@ pub fn build(b: *std.Build) !void {
         link_step.addArg("--shell-file");
         link_step.addArg("web/template.html");
 
+        // link_step.addArg("-s");
+        // link_step.addArg("ASSERTIONS");
+        // link_step.addArg("-sALLOW_MEMORY_GROWTH");
+
+        link_step.addArg("-s");
+        link_step.addArg("INITIAL_MEMORY=512mb");
+
+        link_step.addArg("-s");
+        link_step.addArg("TOTAL_STACK=256mb");
+        // link_step.addArg("-s TOTAL_MEMORY=67108864");
+        // link_step.addArg("-s TOTAL_MEMORY=67108864");
+
+        // link_step.addArg("-sALLOW_MEMORY_GROWTH");
+
+        // link_step.addArg("-s TOTAL_MEMORY=67108864");
+        // link_step.addArg("-s TOTAL_MEMORY=67108864");
+        // link_step.addArg("-s TOTAL_MEMORY=67108864");
+
         b.getInstallStep().dependOn(&link_step.step);
         const run_step = try rlz.emcc.emscriptenRunStep(b);
         run_step.step.dependOn(&link_step.step);
-        const run_option = b.step("run", "Run Project");
+        const run_option = b.step("run", "Run BioMechanics");
         run_option.dependOn(&run_step.step);
         return;
     }
 
-    const exe = b.addExecutable(.{ .name = "Project", .root_source_file = b.path("src/main.zig"), .optimize = optimize, .target = target });
+    const exe = b.addExecutable(.{ .name = "BioMechanics", .root_source_file = b.path("src/main.zig"), .optimize = optimize, .target = target });
 
     exe.linkLibrary(raylib_artifact);
     exe.root_module.addImport("raylib", raylib);
     exe.root_module.addImport("raygui", raygui);
 
     const run_cmd = b.addRunArtifact(exe);
-    const run_step = b.step("run", "Run Project");
+    const run_step = b.step("run", "Run BioMechanics");
     run_step.dependOn(&run_cmd.step);
 
     b.installArtifact(exe);

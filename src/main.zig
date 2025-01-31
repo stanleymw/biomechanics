@@ -13,7 +13,7 @@ const consts = @import("consts.zig");
 const assets = @import("assets.zig");
 
 pub fn main() anyerror!void {
-    rl.initWindow(consts.screenWidth, consts.screenHeight, "game2");
+    rl.initWindow(consts.screenWidth, consts.screenHeight, "BioMechanics: The Puzzles of Restoration");
     defer rl.closeWindow(); // Close window and OpenGL context
 
     rl.initAudioDevice();
@@ -44,8 +44,6 @@ pub fn main() anyerror!void {
     var finishedAudio1 = false;
     //var finishedAudio2 = false;
     var startTime: ?f64 = null;
-    const sound1 = assets.introductionSpeech1.getOrLoad().sound;
-    const sound2 = assets.introductionSpeech2.getOrLoad().sound;
     const ending_speech = assets.endingSpeech.getOrLoad().sound;
 
     var currentScreen: types.Screen = .MainMenu;
@@ -70,13 +68,11 @@ pub fn main() anyerror!void {
     };
 
     const main_music = assets.main_music.getOrLoad();
-    const ending_music = assets.ending_music.getOrLoad();
 
     if (!rl.isMusicStreamPlaying(main_music)) {
         rl.playMusicStream(main_music);
     }
     rl.setMusicVolume(main_music, 0.375);
-    rl.setMusicVolume(ending_music, 0.375);
 
     // Main game loop
     while (!rl.windowShouldClose()) {
@@ -191,6 +187,8 @@ pub fn main() anyerror!void {
                     }
                 },
                 .Info => {
+                    const sound1 = assets.introductionSpeech1.getOrLoad().sound;
+                    const sound2 = assets.introductionSpeech2.getOrLoad().sound;
                     // rendering bg
                     const asset = if (!finishedAudio1)
                         assets.desertCutscene.getOrLoad()
@@ -486,12 +484,15 @@ pub fn main() anyerror!void {
                         rl.Color.white,
                     );
 
+                    const ending_music = assets.ending_music.getOrLoad();
+
                     if (!startedEnding) {
                         startTime = rl.getTime();
                         startedEnding = true;
                         current_text = &"";
 
                         rl.stopMusicStream(main_music);
+                        rl.setMusicVolume(ending_music, 0.375);
                         rl.playMusicStream(ending_music);
 
                         continue;
@@ -521,6 +522,7 @@ pub fn main() anyerror!void {
                     //currentScreen = .Globe;
                 },
                 .Credits => {
+                    const ending_music = assets.ending_music.getOrLoad();
                     rl.updateMusicStream(ending_music);
 
                     const delta = rl.getTime() - startTime.?;
