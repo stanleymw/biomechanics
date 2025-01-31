@@ -16,3 +16,5 @@ pub const Family = struct {
 pub fn loadFont(f: [*:0]const u8, s: i32) rl.Font {
     return rl.loadFontEx(f, s, null);
 }
+
+pub var main_font: rl.Font = undefined;

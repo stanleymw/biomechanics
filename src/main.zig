@@ -19,19 +19,19 @@ pub fn main() anyerror!void {
     rl.initAudioDevice();
     defer rl.closeAudioDevice();
 
-    const mainFont = rl.Font.initEx(
+    fonts.main_font = rl.Font.initEx(
         fonts.Family.ArkPixel,
         fonts.Size.Medium,
         null,
     );
-    defer rl.unloadFont(mainFont);
+    defer rl.unloadFont(fonts.main_font);
 
     rl.drawFPS(0, 0);
     // rl.setExitKey(.null);
     rl.setTargetFPS(240);
     rg.guiSetStyle(rg.GuiControl.default, rg.GuiDefaultProperty.text_size, fonts.Size.Medium);
 
-    rg.guiSetFont(mainFont);
+    rg.guiSetFont(fonts.main_font);
 
     // Textures unloading (assets are lazily loaded)
     defer assets.assetPool.deinitAll();
@@ -58,7 +58,7 @@ pub fn main() anyerror!void {
         750,
         500,
         "",
-        mainFont,
+        fonts.main_font,
     );
 
     var pois = [_]gui.PoiPin{
@@ -111,7 +111,7 @@ pub fn main() anyerror!void {
                             },
                             .Hovered => {
                                 const dat: [*:0]const u8 = @ptrCast(poi.location.getInfo().name);
-                                const bounds = rl.measureTextEx(mainFont, dat, fonts.Size.Small, 0);
+                                const bounds = rl.measureTextEx(fonts.main_font, dat, fonts.Size.Small, 0);
                                 rl.drawRectangleRec(
                                     rl.Rectangle.init(
                                         mousePos.x - (bounds.x / 2) - consts.tooltip_padding,
@@ -123,7 +123,7 @@ pub fn main() anyerror!void {
                                 );
 
                                 rl.drawTextEx(
-                                    mainFont,
+                                    fonts.main_font,
                                     dat,
                                     rl.Vector2.init(mousePos.x - (bounds.x / 2), mousePos.y + 32),
                                     fonts.Size.Small,
@@ -195,7 +195,7 @@ pub fn main() anyerror!void {
                     );
 
                     const bounds = rl.measureTextEx(
-                        mainFont,
+                        fonts.main_font,
                         @ptrCast(current_text.*),
                         fonts.Size.Medium,
                         0,
@@ -212,7 +212,7 @@ pub fn main() anyerror!void {
                     );
 
                     rl.drawTextEx(
-                        mainFont,
+                        fonts.main_font,
                         @ptrCast(current_text.*),
                         utils.renderSize().scale(0.5).add(utils.v2(-(bounds.x / 2), -100)),
                         fonts.Size.Medium,
@@ -297,7 +297,7 @@ pub fn main() anyerror!void {
                     const scale_factor = (utils.renderSize().x - 2 * anchor.x) / @as(f32, @floatFromInt(tex.width));
 
                     rl.drawTextEx(
-                        mainFont,
+                        fonts.main_font,
                         @ptrCast(info.name),
                         anchor,
                         fonts.Size.Medium,
@@ -350,7 +350,7 @@ pub fn main() anyerror!void {
                 },
                 .Ending => {
                     rl.drawTextEx(
-                        mainFont,
+                        fonts.main_font,
                         "Game Completed !!\nThanks for playing!!",
                         utils.renderSize().scale(0.5),
                         fonts.Size.Medium,
@@ -360,7 +360,7 @@ pub fn main() anyerror!void {
                 },
             }
 
-            rl.drawFPS(0, 0);
+            // rl.drawFPS(0, 0);
         }
     }
 }

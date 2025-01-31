@@ -7,6 +7,8 @@ const gui = @import("gui.zig");
 const utils = @import("utils.zig");
 const assets = @import("assets.zig");
 
+const fonts = @import("fonts.zig");
+
 var selectedIndex: usize = 0;
 
 const Direction = enum(u2) { Vertical, DiagonalUp, Horizontal, DiagonalDown };
@@ -643,8 +645,16 @@ pub fn loop() bool {
     }
 
     if (rendering_target) {
-        rl.drawText("Target State", 0, 0, 48, rl.Color.white);
+        rl.drawTextEx(
+            fonts.main_font,
+            "Target State",
+            rl.Vector2.init(10, 64),
+            fonts.Size.Large,
+            0,
+            rl.Color.white,
+        );
     }
+
     if (rl.isKeyDown(.right_bracket) or hasWon()) {
         if (gui.imgBtn(
             0.6,
