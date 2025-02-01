@@ -48,6 +48,12 @@
         height: 90vh;
       }
 
+      .flexr {
+        flex: auto;
+        flex-direction: row;
+        gap: 4px;
+      }
+
       .spinner {
         height: 50px;
         width: 50px;
@@ -116,6 +122,14 @@
     <div class="emscripten">
       <progress value="0" max="100" id="progress" hidden="1"></progress>
     </div>
+
+    <div class="emscripten">
+      <input
+        type="button"
+        value="Fullscreen"
+        onclick="Module.requestFullscreen(false, false)"
+      />
+    </div>
     <div class="emscripten_border">
       <canvas
         class="emscripten"
@@ -124,14 +138,8 @@
         tabindex="-1"
       ></canvas>
     </div>
+
     <hr />
-    <div class="emscripten">
-      <input
-        type="button"
-        value="Fullscreen"
-        onclick="Module.requestFullscreen(false, false)"
-      />
-    </div>
     <span
       >Source Code:
       <a
@@ -141,7 +149,7 @@
         >https://github.com/stanleymw/biomechanics</a
       ></span
     >
-    <div>
+    <div style="position: absolute; top: 16px; left: 16px; max-width: 20vw;">
       <h2>
         A row/column/diagonal can be moved if and only if
       </h2>
