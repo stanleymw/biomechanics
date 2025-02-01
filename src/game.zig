@@ -461,7 +461,10 @@ fn indexToWorldPos(pos: u8) i32 {
 }
 
 fn worldPosToIndex(pos: f32) u8 {
-    return @intCast(@divTrunc(@as(i32, @intFromFloat(pos)), block_size));
+    if (pos < 1.0) {
+        return 0;
+    }
+    return @intCast(@divFloor(@as(i32, @intFromFloat(pos)), block_size));
 }
 
 fn renderWiresForDirectionWithSelectedIndex(direction: Direction, idx: usize, is_active: bool) void {
@@ -743,16 +746,16 @@ pub fn loop() bool {
 
                 switch (shiftDir) {
                     .Vertical => {
-                        if (shiftColumn(ic + 1, if (shiftUp) -1 else 1)) {
-                            mouse_state.isHeld = false;
-                        }
+                        // if (shiftColumn(ic + 1, if (shiftUp) -1 else 1)) {
+                        //     mouse_state.isHeld = false;
+                        // }
                     },
                     .DiagonalUp => {},
                     .Horizontal => {},
                     .DiagonalDown => {},
                 }
 
-                std.debug.print("{}: {}\n", .{ shiftDir, shiftUp });
+                // std.debug.print("{}: {}\n", .{ shiftDir, shiftUp });
             }
         }
     } else {
