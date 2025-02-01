@@ -556,7 +556,7 @@ pub fn main() anyerror!void {
                         9...13 => current_text = &"The human population has grown steadily,\nas lands and resources have started to be renewed.",
                         14...17 => current_text = &"Now retired, you sit comfortably,\nwatching over the world which created you",
                         18...22 => current_text = &"and which you have saved.",
-                        23...27 => current_text = &"",
+                        23...26 => current_text = &"",
                         else => {
                             startTime = rl.getTime();
                             currentScreen = .Credits;
