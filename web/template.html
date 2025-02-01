@@ -141,6 +141,21 @@
         >https://github.com/stanleymw/biomechanics</a
       ></span
     >
+    <div>
+      <h2>
+        A row/column/diagonal can be moved if and only if
+      </h2>
+      <ol>
+        <li>
+          the number of pieces currently in it is the same as the final number of pieces in it
+          (which can be viewed by pressing q)
+        </li>
+        <li>
+          all pieces in it are contiguous (in other words,
+          touching each other so that there are no gaps in between)
+        </li>
+      </ol>
+    </div>
 
     <hr />
     <textarea class="emscripten" id="output" rows="8"></textarea>
@@ -224,7 +239,7 @@
       };
       Module.setStatus("Downloading...");
       window.onerror = () => {
-        Module.setStatus("Exception thrown, see JavaScript console");
+        Module.setStatus("Exception thrown, see JavaScript console. This may be due to a new update. Press Control-Shift-Refresh to force refresh the site. If that doesn't work, try clearing your cache.");
         spinnerElement.style.display = "none";
         Module.setStatus = (text) => {
           if (text) console.error("[post-exception status] " + text);
