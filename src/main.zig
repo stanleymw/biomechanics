@@ -19,7 +19,7 @@ pub fn main() anyerror!void {
     rl.initAudioDevice();
     defer rl.closeAudioDevice();
 
-    fonts.main_font = rl.Font.initEx(
+    fonts.main_font = try rl.Font.initEx(
         fonts.Family.ArkPixel,
         fonts.Size.Medium,
         null,
@@ -49,8 +49,8 @@ pub fn main() anyerror!void {
 
     var tut_anim_timer: f32 = 0;
     var animFrames: i32 = 0;
-    const tutorialAnim = rl.loadImageAnim("resources/tutorial.gif", &animFrames);
-    const tut_tex = rl.loadTextureFromImage(tutorialAnim);
+    const tutorialAnim = try rl.loadImageAnim("resources/tutorial.gif", &animFrames);
+    const tut_tex = try rl.loadTextureFromImage(tutorialAnim);
     var nextFrameDataOffset: usize = 0;
     var currentAnimFrame: i32 = 0;
 
