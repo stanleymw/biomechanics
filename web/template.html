@@ -239,7 +239,7 @@
       };
       Module.setStatus("Downloading...");
       window.onerror = () => {
-        Module.setStatus("Exception thrown, see JavaScript console. This may be due to a new update. Press Control-Shift-Refresh to force refresh the site. If that doesn't work, try clearing your cache.");
+        Module.setStatus("Exception thrown, see JavaScript console. This may be due to a new update. Press Control-Shift-R to force refresh the site. If that does not work, try clearing your cache.");
         spinnerElement.style.display = "none";
         Module.setStatus = (text) => {
           if (text) console.error("[post-exception status] " + text);
