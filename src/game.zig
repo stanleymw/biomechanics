@@ -87,6 +87,9 @@ fn isSameSizeAsTargetStateWire(typ: Direction, idx: usize) bool {
                 xc -= 1;
                 yc += 1;
             }
+            if (Level.state[xc][yc]) |_| {
+                count += 1;
+            }
 
             var target_count: u8 = 0;
             xc = old_xc;
@@ -98,6 +101,10 @@ fn isSameSizeAsTargetStateWire(typ: Direction, idx: usize) bool {
                 xc -= 1;
                 yc += 1;
             }
+            if (Level.target_state[xc][yc]) |_| {
+                target_count += 1;
+            }
+
             return count == target_count;
         },
         .DiagonalDown => {
@@ -124,6 +131,9 @@ fn isSameSizeAsTargetStateWire(typ: Direction, idx: usize) bool {
                 xc += 1;
                 yc += 1;
             }
+            if (Level.state[xc][yc]) |_| {
+                count += 1;
+            }
 
             var target_count: u8 = 0;
             xc = old_xc;
@@ -134,6 +144,9 @@ fn isSameSizeAsTargetStateWire(typ: Direction, idx: usize) bool {
                 }
                 xc += 1;
                 yc += 1;
+            }
+            if (Level.target_state[xc][yc]) |_| {
+                target_count += 1;
             }
             return count == target_count;
         },
@@ -289,6 +302,7 @@ fn shiftDiagDown(idx: usize, amount: i32) void {
         return;
     }
     if (!isSameSizeAsTargetStateWire(.DiagonalDown, idx)) {
+        std.debug.print("NOT SAME SIZE AS TARGET\n", .{});
         return;
     }
 
@@ -348,6 +362,7 @@ fn shiftDiagUp(idx: usize, amount: i32) void {
         return;
     }
     if (!isSameSizeAsTargetStateWire(.DiagonalUp, idx)) {
+        std.debug.print("NOT SAME SIZE AS TARGET\n", .{});
         return;
     }
 
