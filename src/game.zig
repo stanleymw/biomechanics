@@ -266,18 +266,18 @@ fn isContiguous(typ: Direction, idx: usize) bool {
     unreachable;
 }
 
-fn shiftColumn(idx: usize, amount: i32) void {
+fn shiftColumn(idx: usize, amount: i32) bool {
     if (!isContiguous(.Vertical, idx)) {
-        return;
+        return false;
     }
     if (!isSameSizeAsTargetStateWire(.Vertical, idx)) {
-        return;
+        return false;
     }
 
     if (amount >= 0) {
         var i = (Level.state[0].len - 2);
         if (Level.state[i + 1][idx] != null) {
-            return;
+            return false;
         }
         while (i >= 0) : (i -= 1) {
             Level.state[@intCast(@as(i32, @intCast(i)) + amount)][idx] = Level.state[i][idx];
@@ -289,7 +289,7 @@ fn shiftColumn(idx: usize, amount: i32) void {
         }
     } else {
         if (Level.state[0][idx] != null) {
-            return;
+            return false;
         }
         for (1..Level.state[0].len) |x| {
             Level.state[@intCast(@as(i32, @intCast(x)) + amount)][idx] = Level.state[x][idx];
@@ -298,15 +298,16 @@ fn shiftColumn(idx: usize, amount: i32) void {
     }
 
     assets.slide_sfx.getOrLoad().play();
+    return true;
 }
 
-fn shiftDiagDown(idx: usize, amount: i32) void {
+fn shiftDiagDown(idx: usize, amount: i32) bool {
     if (!isContiguous(.DiagonalDown, idx)) {
         std.debug.print("NOT CONTIGUOUS\n", .{});
-        return;
+        return false;
     }
     if (!isSameSizeAsTargetStateWire(.DiagonalDown, idx)) {
-        return;
+        return false;
     }
 
     const N = Level.state.len;
@@ -330,7 +331,7 @@ fn shiftDiagDown(idx: usize, amount: i32) void {
         for (0..diag_len - 1) |_| {
             std.debug.print("SHIFT DIAGDOWN UP: {} {} for IDX={}\n", .{ xc, yc, idx });
             if (firsty and Level.state[xc][yc] != null) {
-                return;
+                return false;
             } else {
                 firsty = false;
             }
@@ -345,7 +346,7 @@ fn shiftDiagDown(idx: usize, amount: i32) void {
         for (0..diag_len - 1) |_| {
             std.debug.print("SHIFT DIAGDOWn DOWN: {} {} for IDX={}\n", .{ xc, yc, idx });
             if (firsty and Level.state[xc][yc] != null) {
-                return;
+                return false;
             } else {
                 firsty = false;
             }
@@ -357,15 +358,16 @@ fn shiftDiagDown(idx: usize, amount: i32) void {
     }
 
     assets.slide_sfx.getOrLoad().play();
+    return true;
 }
 
-fn shiftDiagUp(idx: usize, amount: i32) void {
+fn shiftDiagUp(idx: usize, amount: i32) bool {
     if (!isContiguous(.DiagonalUp, idx)) {
         std.debug.print("NOT CONTIGUOUS\n", .{});
-        return;
+        return false;
     }
     if (!isSameSizeAsTargetStateWire(.DiagonalUp, idx)) {
-        return;
+        return false;
     }
 
     const N = Level.state.len;
@@ -386,7 +388,7 @@ fn shiftDiagUp(idx: usize, amount: i32) void {
         var firsty = true;
         for (0..diag_len - 1) |_| {
             if (firsty and Level.state[xc][yc] != null) {
-                return;
+                return false;
             } else {
                 firsty = false;
             }
@@ -401,7 +403,7 @@ fn shiftDiagUp(idx: usize, amount: i32) void {
         for (0..diag_len - 1) |_| {
             std.debug.print("SHIFT DIAGUP DOWN: {} {} for IDX={}\n", .{ xc, yc, idx });
             if (firsty and Level.state[xc][yc] != null) {
-                return;
+                return false;
             } else {
                 firsty = false;
             }
@@ -413,20 +415,21 @@ fn shiftDiagUp(idx: usize, amount: i32) void {
     }
 
     assets.slide_sfx.getOrLoad().play();
+    return true;
 }
 
-fn shiftRow(idx: usize, amount: i32) void {
+fn shiftRow(idx: usize, amount: i32) bool {
     if (!isContiguous(.Horizontal, idx)) {
-        return;
+        return false;
     }
     if (!isSameSizeAsTargetStateWire(.Horizontal, idx)) {
-        return;
+        return false;
     }
 
     if (amount >= 0) {
         var i = (Level.state[0].len - 2);
         if (Level.state[idx][i + 1] != null) {
-            return;
+            return false;
         }
         while (i >= 0) : (i -= 1) {
             Level.state[idx][@intCast(@as(i32, @intCast(i)) + amount)] = Level.state[idx][i];
@@ -438,7 +441,7 @@ fn shiftRow(idx: usize, amount: i32) void {
         }
     } else {
         if (Level.state[idx][0] != null) {
-            return;
+            return false;
         }
         for (1..Level.state[0].len) |x| {
             Level.state[idx][@intCast(@as(i32, @intCast(x)) + amount)] = Level.state[idx][x];
@@ -447,6 +450,7 @@ fn shiftRow(idx: usize, amount: i32) void {
     }
 
     assets.slide_sfx.getOrLoad().play();
+    return true;
 }
 
 var block_size: i32 = 0;
@@ -585,10 +589,10 @@ pub fn loop() bool {
             selectedIndex = @mod(selectedIndex, directionToWires(cursorState).len);
 
             if (rl.isKeyPressed(.up)) {
-                shiftColumn(Level.vertical_wires[selectedIndex], -1);
+                _ = shiftColumn(Level.vertical_wires[selectedIndex], -1);
             }
             if (rl.isKeyPressed(.down)) {
-                shiftColumn(Level.vertical_wires[selectedIndex], 1);
+                _ = shiftColumn(Level.vertical_wires[selectedIndex], 1);
             }
         },
         .DiagonalUp => {
@@ -602,10 +606,10 @@ pub fn loop() bool {
             selectedIndex = @mod(selectedIndex, directionToWires(cursorState).len);
 
             if (rl.isKeyPressed(.right)) {
-                shiftDiagUp(Level.diag_up_wires[selectedIndex] + 1, 1);
+                _ = shiftDiagUp(Level.diag_up_wires[selectedIndex] + 1, 1);
             }
             if (rl.isKeyPressed(.left)) {
-                shiftDiagUp(Level.diag_up_wires[selectedIndex] + 1, -1);
+                _ = shiftDiagUp(Level.diag_up_wires[selectedIndex] + 1, -1);
             }
         },
         .Horizontal => {
@@ -619,10 +623,10 @@ pub fn loop() bool {
             selectedIndex = @mod(selectedIndex, directionToWires(cursorState).len);
 
             if (rl.isKeyPressed(.right)) {
-                shiftRow(Level.horizontal_wires[selectedIndex], 1);
+                _ = shiftRow(Level.horizontal_wires[selectedIndex], 1);
             }
             if (rl.isKeyPressed(.left)) {
-                shiftRow(Level.horizontal_wires[selectedIndex], -1);
+                _ = shiftRow(Level.horizontal_wires[selectedIndex], -1);
             }
         },
         .DiagonalDown => {
@@ -636,10 +640,10 @@ pub fn loop() bool {
             selectedIndex = @mod(selectedIndex, directionToWires(cursorState).len);
 
             if (rl.isKeyPressed(.right)) {
-                shiftDiagDown(Level.diag_down_wires[selectedIndex] + 1, -1);
+                _ = shiftDiagDown(Level.diag_down_wires[selectedIndex] + 1, -1);
             }
             if (rl.isKeyPressed(.left)) {
-                shiftDiagDown(Level.diag_down_wires[selectedIndex] + 1, 1);
+                _ = shiftDiagDown(Level.diag_down_wires[selectedIndex] + 1, 1);
             }
         },
     }
@@ -687,9 +691,11 @@ pub fn loop() bool {
             mouse_state.startedHoldPos = current_mouse_pos;
             mouse_state.startedCol = worldPosToIndex(current_mouse_pos.x);
             mouse_state.startedRow = worldPosToIndex(current_mouse_pos.y);
-            std.debug.print("{}", .{mouse_state.startedHoldPos});
-        }
 
+            if (Level.state[mouse_state.startedCol][mouse_state.startedRow] == null) {
+                mouse_state.isHeld = false;
+            }
+        }
         if (mouse_state.isHeld) {
             // calculate how far it is from the start pos
             rl.drawLineEx(mouse_state.startedHoldPos, current_mouse_pos, 2.0, rl.Color.green);
@@ -703,40 +709,51 @@ pub fn loop() bool {
 
             rl.drawRectangle(ir * block_size, ic * block_size, block_size, block_size, rl.Color.green);
 
-            var shiftUp: bool = undefined;
-            var shiftDir: Direction = undefined;
-            if (angle <= -pi + pi / 6.0) {
-                shiftDir = .Horizontal;
-                shiftUp = true;
-            } else if (angle <= -pi + pi / 3.0) {
-                shiftDir = .DiagonalDown;
-                shiftUp = false;
-            } else if (angle <= -pi + pi / 2.0 + pi / 6.0) {
-                shiftDir = .Vertical;
-                shiftUp = false;
-            } else if (angle <= -pi + pi / 2.0 + pi / 6.0 + pi / 6.0) {
-                shiftDir = .DiagonalUp;
-                shiftUp = false;
-            } else if (angle <= 0 + pi / 6.0) {
-                shiftDir = .Horizontal;
-                shiftUp = false;
-            } else if (angle <= pi / 3.0) {
-                shiftDir = .DiagonalDown;
-                shiftUp = true;
-            } else if (angle <= pi / 2.0 + pi / 6.0) {
-                shiftDir = .Vertical;
-                shiftUp = true;
-            } else if (angle <= pi / 2.0 + pi / 3.0) {
-                shiftDir = .DiagonalUp;
-                shiftUp = true;
-            } else {
-                shiftDir = .Horizontal;
-                shiftUp = true;
+            if (ir != mouse_state.startedRow or ic != mouse_state.startedCol) {
+                var shiftUp: bool = undefined;
+                var shiftDir: Direction = undefined;
+                if (angle <= -pi + pi / 6.0) {
+                    shiftDir = .Horizontal;
+                    shiftUp = true;
+                } else if (angle <= -pi + pi / 3.0) {
+                    shiftDir = .DiagonalDown;
+                    shiftUp = false;
+                } else if (angle <= -pi + pi / 2.0 + pi / 6.0) {
+                    shiftDir = .Vertical;
+                    shiftUp = false;
+                } else if (angle <= -pi + pi / 2.0 + pi / 6.0 + pi / 6.0) {
+                    shiftDir = .DiagonalUp;
+                    shiftUp = false;
+                } else if (angle <= 0 + pi / 6.0) {
+                    shiftDir = .Horizontal;
+                    shiftUp = false;
+                } else if (angle <= pi / 3.0) {
+                    shiftDir = .DiagonalDown;
+                    shiftUp = true;
+                } else if (angle <= pi / 2.0 + pi / 6.0) {
+                    shiftDir = .Vertical;
+                    shiftUp = true;
+                } else if (angle <= pi / 2.0 + pi / 3.0) {
+                    shiftDir = .DiagonalUp;
+                    shiftUp = true;
+                } else {
+                    shiftDir = .Horizontal;
+                    shiftUp = true;
+                }
+
+                switch (shiftDir) {
+                    .Vertical => {
+                        if (shiftColumn(ic + 1, if (shiftUp) -1 else 1)) {
+                            mouse_state.isHeld = false;
+                        }
+                    },
+                    .DiagonalUp => {},
+                    .Horizontal => {},
+                    .DiagonalDown => {},
+                }
+
+                std.debug.print("{}: {}\n", .{ shiftDir, shiftUp });
             }
-
-            switch (shiftDir) {}
-
-            std.debug.print("{}: {}\n", .{ shiftDir, shiftUp });
         }
     } else {
         if (mouse_state.isHeld) {
