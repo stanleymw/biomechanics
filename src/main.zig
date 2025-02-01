@@ -566,7 +566,7 @@ pub fn main() anyerror!void {
                 },
             }
 
-            //rl.drawFPS(0, 0);
+            rl.drawFPS(0, 0);
         }
     }
 }

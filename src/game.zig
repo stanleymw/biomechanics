@@ -9,10 +9,27 @@ const assets = @import("assets.zig");
 
 const fonts = @import("fonts.zig");
 
+const pi = std.math.pi;
+const pi2 = std.math.tau;
+
 var selectedIndex: usize = 0;
 
 const Direction = enum(u2) { Vertical, DiagonalUp, Horizontal, DiagonalDown };
 var cursorState: Direction = .Vertical;
+
+const MouseState = struct {
+    isHeld: bool = false,
+    startedHoldPos: rl.Vector2,
+    startedRow: usize,
+    startedCol: usize,
+};
+
+var mouse_state = MouseState{
+    .isHeld = false,
+    .startedHoldPos = rl.Vector2.init(0, 0),
+    .startedRow = 0,
+    .startedCol = 0,
+};
 
 var Level: types.LevelData = undefined;
 var level_loaded = false;
@@ -439,6 +456,10 @@ fn indexToWorldPos(pos: u8) i32 {
     return pos * block_size + (block_size >> 1);
 }
 
+fn worldPosToIndex(pos: f32) u8 {
+    return @intCast(@divTrunc(@as(i32, @intFromFloat(pos)), block_size));
+}
+
 fn renderWiresForDirectionWithSelectedIndex(direction: Direction, idx: usize, is_active: bool) void {
     const wires = directionToWires(direction);
     switch (direction) {
@@ -656,6 +677,71 @@ pub fn loop() bool {
             0,
             rl.Color.white,
         );
+    }
+
+    if (rl.isMouseButtonDown(.left)) {
+        const current_mouse_pos = rl.getMousePosition();
+        if (!mouse_state.isHeld) {
+            mouse_state.isHeld = true;
+
+            mouse_state.startedHoldPos = current_mouse_pos;
+            mouse_state.startedCol = worldPosToIndex(current_mouse_pos.x);
+            mouse_state.startedRow = worldPosToIndex(current_mouse_pos.y);
+            std.debug.print("{}", .{mouse_state.startedHoldPos});
+        }
+
+        if (mouse_state.isHeld) {
+            // calculate how far it is from the start pos
+            rl.drawLineEx(mouse_state.startedHoldPos, current_mouse_pos, 2.0, rl.Color.green);
+            const angle = std.math.atan2(
+                mouse_state.startedHoldPos.y - current_mouse_pos.y,
+                mouse_state.startedHoldPos.x - current_mouse_pos.x,
+            );
+
+            const ir = worldPosToIndex(current_mouse_pos.x);
+            const ic = worldPosToIndex(current_mouse_pos.y);
+
+            rl.drawRectangle(ir * block_size, ic * block_size, block_size, block_size, rl.Color.green);
+
+            var shiftUp: bool = undefined;
+            var shiftDir: Direction = undefined;
+            if (angle <= -pi + pi / 6.0) {
+                shiftDir = .Horizontal;
+                shiftUp = true;
+            } else if (angle <= -pi + pi / 3.0) {
+                shiftDir = .DiagonalDown;
+                shiftUp = false;
+            } else if (angle <= -pi + pi / 2.0 + pi / 6.0) {
+                shiftDir = .Vertical;
+                shiftUp = false;
+            } else if (angle <= -pi + pi / 2.0 + pi / 6.0 + pi / 6.0) {
+                shiftDir = .DiagonalUp;
+                shiftUp = false;
+            } else if (angle <= 0 + pi / 6.0) {
+                shiftDir = .Horizontal;
+                shiftUp = false;
+            } else if (angle <= pi / 3.0) {
+                shiftDir = .DiagonalDown;
+                shiftUp = true;
+            } else if (angle <= pi / 2.0 + pi / 6.0) {
+                shiftDir = .Vertical;
+                shiftUp = true;
+            } else if (angle <= pi / 2.0 + pi / 3.0) {
+                shiftDir = .DiagonalUp;
+                shiftUp = true;
+            } else {
+                shiftDir = .Horizontal;
+                shiftUp = true;
+            }
+
+            switch (shiftDir) {}
+
+            std.debug.print("{}: {}\n", .{ shiftDir, shiftUp });
+        }
+    } else {
+        if (mouse_state.isHeld) {
+            mouse_state.isHeld = false;
+        }
     }
 
     if (rl.isKeyDown(.right_bracket) or hasWon()) {
