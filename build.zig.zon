@@ -3,8 +3,8 @@
     .version = "0.0.1",
     .dependencies = .{
         .@"raylib-zig" = .{
-            .url = "git+https://github.com/Not-Nik/raylib-zig?ref=devel#57041e707c06360808c9026f41c968c914e5415c",
-            .hash = "1220fef1b089185bea1d40b5997ae82ed6e84732b815edfc1e39ce2173aaca3310b2",
+            .url = "git+https://github.com/Seirea/raylib-zig?ref=devel#050b53e3b7d083e675af08dbebb06a67b63aed07",
+            .hash = "1220c3555837aa60aac84f711e144dc3a4877768e551db80acc8da92913a52a01514",
         },
     },
     .paths = .{""},
