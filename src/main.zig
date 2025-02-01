@@ -156,11 +156,12 @@ pub fn main() anyerror!void {
                     if (gui.backBtn(mousePos)) {
                         currentScreen = .{ .ComponentInfo = place.location };
                         game.unloadLevel();
-                        std.debug.print("unloaded: {}\n", .{game.levelUnloaded()});
+                        std.debug.print("Unloaded: {}\n", .{game.levelUnloaded()});
                     } else {
-                        if (game.levelUnloaded()) {
+                        if (game.levelUnloaded() or rl.isKeyPressed(.r)) {
+                            game.unloadLevel();
                             game.loadLevel(loc_info.levels[place.level]);
-                            std.debug.print("loaded: {s}\n", .{loc_info.levels[place.level].name});
+                            std.debug.print("Loaded: {s}\n", .{loc_info.levels[place.level].name});
                         }
                     }
 
@@ -172,18 +173,18 @@ pub fn main() anyerror!void {
                             location.levels[place.level].locked = false;
 
                             game.loadLevel(loc_info.levels[place.level]);
-                            std.debug.print("loaded: {s} due to win\n", .{loc_info.levels[place.level].name});
+                            std.debug.print("Loaded: {s} due to win\n", .{loc_info.levels[place.level].name});
                         } else {
                             currentScreen = .Globe;
                             game.unloadLevel();
                             for (&pois, 0..) |*poi, idx| {
-                                std.debug.print("OUR PLACE: {s}\n", .{loc_real.getInfo().name});
+                                std.debug.print("This location: {s}\n", .{loc_real.getInfo().name});
                                 if (poi.location == loc_real) {
                                     poi.isCompleted = true;
-                                    std.debug.print("finished POI {s}\n", .{poi.location.getInfo().name});
+                                    std.debug.print("Finished POI {s}\n", .{poi.location.getInfo().name});
                                     if (idx + 1 < pois.len) {
                                         pois[idx + 1].isLocked = false;
-                                        std.debug.print("unlocked next poi due to win\n", .{});
+                                        std.debug.print("Unlocked next POI due to win\n", .{});
                                     } else {
                                         currentScreen = .Ending;
                                     }
