@@ -301,12 +301,13 @@ pub fn main() anyerror!void {
                     //currentScreen = .Globe;
                 },
                 .Tutorial => {
+                    const speed = 6;
                     tut_anim_timer += rl.getFrameTime();
-                    while (tut_anim_timer >= 3) {
+                    while (tut_anim_timer >= speed) {
                         currentAnimFrame = @rem(currentAnimFrame + 1, animFrames);
                         nextFrameDataOffset = 4 * @as(u32, @intCast(tutorialAnim.width * tutorialAnim.height * currentAnimFrame));
                         rl.updateTexture(tut_tex, @ptrFromInt(@as(usize, @intFromPtr(tutorialAnim.data)) + nextFrameDataOffset));
-                        tut_anim_timer -= 3;
+                        tut_anim_timer -= speed;
                     }
                     rl.drawTextureEx(
                         tut_tex,
