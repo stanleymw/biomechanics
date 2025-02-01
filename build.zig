@@ -16,6 +16,14 @@ pub fn build(b: *std.Build) !void {
 
     //web exports are completely separate
     if (target.query.os_tag == .emscripten) {
+        const web_assets = b.addInstallDirectory(.{
+            .source_dir = b.path("web"),
+            .install_dir = .{ .prefix = {} },
+            .install_subdir = "htmlout",
+            .exclude_extensions = &.{"template.html"},
+        });
+        b.getInstallStep().dependOn(&web_assets.step);
+
         const exe_lib = try rlz.emcc.compileForEmscripten(b, "BioMechanics", "src/main.zig", target, optimize);
 
         exe_lib.linkLibrary(raylib_artifact);
