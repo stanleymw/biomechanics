@@ -48,6 +48,7 @@ pub fn main() anyerror!void {
     const ending_speech = assets.endingSpeech.getOrLoad().sound;
 
     var tut_anim_timer: f32 = 0;
+    var tutorial_watched_at_least_once: bool = false;
     var animFrames: i32 = 0;
     const tutorialAnim = try rl.loadImageAnim("resources/tutorial.gif", &animFrames);
     const tut_tex = try rl.loadTextureFromImage(tutorialAnim);
@@ -303,11 +304,15 @@ pub fn main() anyerror!void {
                 .Tutorial => {
                     const speed = 6;
                     tut_anim_timer += rl.getFrameTime();
+
                     while (tut_anim_timer >= speed) {
+                        if (currentAnimFrame + 1 == animFrames) {
+                            tutorial_watched_at_least_once = true;
+                        }
                         currentAnimFrame = @rem(currentAnimFrame + 1, animFrames);
                         nextFrameDataOffset = 4 * @as(u32, @intCast(tutorialAnim.width * tutorialAnim.height * currentAnimFrame));
                         rl.updateTexture(tut_tex, @ptrFromInt(@as(usize, @intFromPtr(tutorialAnim.data)) + nextFrameDataOffset));
-                        tut_anim_timer -= speed;
+                        tut_anim_timer = 0.0;
                     }
                     rl.drawTextureEx(
                         tut_tex,
@@ -316,17 +321,19 @@ pub fn main() anyerror!void {
                         3.375,
                         rl.Color.white,
                     );
-                    rl.drawTextEx(
-                        fonts.main_font,
-                        "Press to exit tutorial",
-                        rl.Vector2.init(10, @floatFromInt(rl.getRenderHeight() - 64)),
-                        fonts.Size.Medium,
-                        0,
-                        rl.Color.white,
-                    );
-                    if (rl.isMouseButtonPressed(.left)) {
-                        rl.unloadImage(tutorialAnim);
-                        currentScreen = .Globe;
+                    if (tutorial_watched_at_least_once) {
+                        rl.drawTextEx(
+                            fonts.main_font,
+                            "Click to exit tutorial",
+                            rl.Vector2.init(10, @floatFromInt(rl.getRenderHeight() - 64)),
+                            fonts.Size.Medium,
+                            0,
+                            rl.Color.white,
+                        );
+                        if (rl.isMouseButtonPressed(.left)) {
+                            rl.unloadImage(tutorialAnim);
+                            currentScreen = .Globe;
+                        }
                     }
                 },
                 .LocationInfo => |*location| {

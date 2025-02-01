@@ -680,7 +680,7 @@ pub fn loop() bool {
             null,
             null,
             rl.getMousePosition(),
-        )) {
+        ) or rl.isMouseButtonPressed(.left)) {
             won = false;
             return true;
         }
