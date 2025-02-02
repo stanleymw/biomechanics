@@ -265,7 +265,7 @@ pub var carbon_levels = [_]LevelData{
         },
         .texture = &assets.carbonComponent0,
         .info =
-        \\ This system extracts carbon deoxide from flue gases
+        \\ This system extracts carbon dioxide from flue gases
         \\ produced during industrial processes or power generation.
         ,
         .locked = false,
@@ -298,9 +298,9 @@ pub var carbon_levels = [_]LevelData{
         },
         .texture = &assets.carbonComponent1,
         .info =
-        \\ Compressed carbon deoxide is transported via pipelines,
+        \\ Compressed carbon dioxide is transported via pipelines,
         \\ ships, or trucks to storage sites. Pipelines are the
-        \\ most common method for large-scale carbon deoxide
+        \\ most common method for large-scale carbon dioxide
         \\ transport.
         ,
         .locked = true,
@@ -336,7 +336,7 @@ pub var carbon_levels = [_]LevelData{
         },
         .texture = &assets.carbonComponent2,
         .info =
-        \\ These are used to inject carbon deoxide into deep
+        \\ These are used to inject carbon dioxide into deep
         \\ geological formations, such as depleted oil and gas
         \\ fields or deep saline aquifers, for long-term storage.
         ,
@@ -362,10 +362,10 @@ pub var location_data = [_]LocationData{
         .image_scale = 0.8,
         .info =
         \\Carbon capture technology plays an important role in controlling
-        \\climate change by reducing the amount of carbon deoxide being
+        \\climate change by reducing the amount of carbon dioxide being
         \\released into the atmosphere from industrial activities and power
         \\generation. The carbon capture system captures and stores carbon
-        \\deoxide emissions, thus decreasing greenhouse gas concentrations
+        \\dioxide emissions, thus decreasing greenhouse gas concentrations
         \\that contribute to global warming.
         ,
         .levels = &carbon_levels,

@@ -69,6 +69,12 @@
         outline: none;
       }
 
+      .flexr {
+        flex: auto;
+        flex-direction: row;
+        gap: 4px;
+      }
+
       .spinner {
         height: 50px;
         width: 50px;
@@ -137,15 +143,7 @@
     <div class="emscripten">
       <progress value="0" max="100" id="progress" hidden="1"></progress>
     </div>
-    <div class="emscripten_border">
-      <canvas
-        class="emscripten"
-        id="canvas"
-        oncontextmenu="event.preventDefault()"
-        tabindex="-1"
-      ></canvas>
-    </div>
-    <hr />
+
     <div class="emscripten">
       <input
         type="image"
@@ -156,6 +154,16 @@
         onclick="Module.requestFullscreen(false, false)"
       />
     </div>
+    <div class="emscripten_border">
+      <canvas
+        class="emscripten"
+        id="canvas"
+        oncontextmenu="event.preventDefault()"
+        tabindex="-1"
+      ></canvas>
+    </div>
+
+    <hr />
     <span
       >Source Code:
       <a
@@ -165,6 +173,36 @@
         >https://github.com/stanleymw/biomechanics</a
       ></span
     >
+    <div style="position: absolute; top: 16px; left: 16px; max-width: 20vw;">
+      <h3>
+        A row/column/diagonal can be moved if and only if
+      </h3>
+      <ol>
+        <li>
+          the number of pieces currently in it is the same as the final number of pieces in it
+          (which can be viewed by pressing q)
+        </li>
+        <li>
+          all pieces in it are contiguous (in other words,
+          touching each other so that there are no gaps in between)
+        </li>
+      </ol>
+      <h3>Keybinds:</h3>
+      <ul>
+        <li>
+          Q = Show Target/Goal State.
+        </li>
+        <li>
+          R = Reset current level.
+        </li>
+        <li>
+          Space = Switch selected Wire orientation (cycle between vertical, horizontal, diagonal).
+        </li>
+        <li>
+          Arrow Keys = Select and Move Wires.
+        </li>
+      </ul>
+    </div>
 
     <hr />
     <textarea class="emscripten" id="output" rows="8"></textarea>
@@ -248,7 +286,7 @@
       };
       Module.setStatus("Downloading...");
       window.onerror = () => {
-        Module.setStatus("Exception thrown, see JavaScript console");
+        Module.setStatus("Exception thrown, see JavaScript console. This may be due to a new update. Press Control-Shift-R to force refresh the site. If that does not work, try clearing your cache.");
         spinnerElement.style.display = "none";
         Module.setStatus = (text) => {
           if (text) console.error("[post-exception status] " + text);

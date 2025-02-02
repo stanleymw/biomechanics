@@ -68,6 +68,12 @@ pub fn build(b: *std.Build) !void {
     }
 
     const exe = b.addExecutable(.{ .name = "BioMechanics", .root_source_file = b.path("src/main.zig"), .optimize = optimize, .target = target });
+    const resources_folder = b.addInstallDirectory(.{
+        .source_dir = b.path("resources/"),
+        .install_dir = .{ .bin = {} },
+        .install_subdir = "resources",
+    });
+    b.getInstallStep().dependOn(&resources_folder.step);
 
     exe.linkLibrary(raylib_artifact);
     exe.root_module.addImport("raylib", raylib);

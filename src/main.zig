@@ -48,6 +48,7 @@ pub fn main() anyerror!void {
     const ending_speech = assets.endingSpeech.getOrLoad().sound;
 
     var tut_anim_timer: f32 = 0;
+    var tutorial_watched_at_least_once: bool = false;
     var animFrames: i32 = 0;
     const tutorialAnim = try rl.loadImageAnim("resources/tutorial.gif", &animFrames);
     const tut_tex = try rl.loadTextureFromImage(tutorialAnim);
@@ -155,11 +156,12 @@ pub fn main() anyerror!void {
                     if (gui.backBtn(mousePos)) {
                         currentScreen = .{ .ComponentInfo = place.location };
                         game.unloadLevel();
-                        std.debug.print("unloaded: {}\n", .{game.levelUnloaded()});
+                        std.debug.print("Unloaded: {}\n", .{game.levelUnloaded()});
                     } else {
-                        if (game.levelUnloaded()) {
+                        if (game.levelUnloaded() or rl.isKeyPressed(.r)) {
+                            game.unloadLevel();
                             game.loadLevel(loc_info.levels[place.level]);
-                            std.debug.print("loaded: {s}\n", .{loc_info.levels[place.level].name});
+                            std.debug.print("Loaded: {s}\n", .{loc_info.levels[place.level].name});
                         }
                     }
 
@@ -171,18 +173,18 @@ pub fn main() anyerror!void {
                             location.levels[place.level].locked = false;
 
                             game.loadLevel(loc_info.levels[place.level]);
-                            std.debug.print("loaded: {s} due to win\n", .{loc_info.levels[place.level].name});
+                            std.debug.print("Loaded: {s} due to win\n", .{loc_info.levels[place.level].name});
                         } else {
                             currentScreen = .Globe;
                             game.unloadLevel();
                             for (&pois, 0..) |*poi, idx| {
-                                std.debug.print("OUR PLACE: {s}\n", .{loc_real.getInfo().name});
+                                std.debug.print("This location: {s}\n", .{loc_real.getInfo().name});
                                 if (poi.location == loc_real) {
                                     poi.isCompleted = true;
-                                    std.debug.print("finished POI {s}\n", .{poi.location.getInfo().name});
+                                    std.debug.print("Finished POI {s}\n", .{poi.location.getInfo().name});
                                     if (idx + 1 < pois.len) {
                                         pois[idx + 1].isLocked = false;
-                                        std.debug.print("unlocked next poi due to win\n", .{});
+                                        std.debug.print("Unlocked next POI due to win\n", .{});
                                     } else {
                                         currentScreen = .Ending;
                                     }
@@ -303,11 +305,15 @@ pub fn main() anyerror!void {
                 .Tutorial => {
                     const speed = 6;
                     tut_anim_timer += rl.getFrameTime();
+
                     while (tut_anim_timer >= speed) {
+                        if (currentAnimFrame + 1 == animFrames) {
+                            tutorial_watched_at_least_once = true;
+                        }
                         currentAnimFrame = @rem(currentAnimFrame + 1, animFrames);
                         nextFrameDataOffset = 4 * @as(u32, @intCast(tutorialAnim.width * tutorialAnim.height * currentAnimFrame));
                         rl.updateTexture(tut_tex, @ptrFromInt(@as(usize, @intFromPtr(tutorialAnim.data)) + nextFrameDataOffset));
-                        tut_anim_timer -= speed;
+                        tut_anim_timer = 0.0;
                     }
                     rl.drawTextureEx(
                         tut_tex,
@@ -316,17 +322,19 @@ pub fn main() anyerror!void {
                         3.375,
                         rl.Color.white,
                     );
-                    rl.drawTextEx(
-                        fonts.main_font,
-                        "Press to exit tutorial",
-                        rl.Vector2.init(10, @floatFromInt(rl.getRenderHeight() - 64)),
-                        fonts.Size.Medium,
-                        0,
-                        rl.Color.white,
-                    );
-                    if (rl.isMouseButtonPressed(.left)) {
-                        rl.unloadImage(tutorialAnim);
-                        currentScreen = .Globe;
+                    if (tutorial_watched_at_least_once) {
+                        rl.drawTextEx(
+                            fonts.main_font,
+                            "Click to exit tutorial",
+                            rl.Vector2.init(10, @floatFromInt(rl.getRenderHeight() - 64)),
+                            fonts.Size.Medium,
+                            0,
+                            rl.Color.white,
+                        );
+                        if (rl.isMouseButtonPressed(.left)) {
+                            rl.unloadImage(tutorialAnim);
+                            currentScreen = .Globe;
+                        }
                     }
                 },
                 .LocationInfo => |*location| {
@@ -549,7 +557,7 @@ pub fn main() anyerror!void {
                         9...13 => current_text = &"The human population has grown steadily,\nas lands and resources have started to be renewed.",
                         14...17 => current_text = &"Now retired, you sit comfortably,\nwatching over the world which created you",
                         18...22 => current_text = &"and which you have saved.",
-                        23...27 => current_text = &"",
+                        23...26 => current_text = &"",
                         else => {
                             startTime = rl.getTime();
                             currentScreen = .Credits;

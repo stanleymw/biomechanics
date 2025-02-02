@@ -80,24 +80,25 @@ fn isSameSizeAsTargetStateWire(typ: Direction, idx: usize) bool {
             const old_xc = xc;
             const old_yc = yc;
 
-            for (0..diag_len - 1) |_| {
+            for (0..diag_len) |_| {
                 if (Level.state[xc][yc]) |_| {
                     count += 1;
                 }
-                xc -= 1;
-                yc += 1;
+                xc -%= 1;
+                yc +%= 1;
             }
 
             var target_count: u8 = 0;
             xc = old_xc;
             yc = old_yc;
-            for (0..diag_len - 1) |_| {
+            for (0..diag_len) |_| {
                 if (Level.target_state[xc][yc]) |_| {
                     target_count += 1;
                 }
-                xc -= 1;
-                yc += 1;
+                xc -%= 1;
+                yc +%= 1;
             }
+
             return count == target_count;
         },
         .DiagonalDown => {
@@ -116,25 +117,26 @@ fn isSameSizeAsTargetStateWire(typ: Direction, idx: usize) bool {
             const old_xc = xc;
             const old_yc = yc;
 
-            for (0..diag_len - 1) |_| {
+            for (0..diag_len) |_| {
                 if (Level.state[xc][yc]) |_| {
                     count += 1;
                 }
 
-                xc += 1;
-                yc += 1;
+                xc +%= 1;
+                yc +%= 1;
             }
 
             var target_count: u8 = 0;
             xc = old_xc;
             yc = old_yc;
-            for (0..diag_len - 1) |_| {
+            for (0..diag_len) |_| {
                 if (Level.target_state[xc][yc]) |_| {
                     target_count += 1;
                 }
-                xc += 1;
-                yc += 1;
+                xc +%= 1;
+                yc +%= 1;
             }
+
             return count == target_count;
         },
     }
@@ -289,6 +291,7 @@ fn shiftDiagDown(idx: usize, amount: i32) void {
         return;
     }
     if (!isSameSizeAsTargetStateWire(.DiagonalDown, idx)) {
+        std.debug.print("NOT SAME SIZE AS TARGET\n", .{});
         return;
     }
 
@@ -348,6 +351,7 @@ fn shiftDiagUp(idx: usize, amount: i32) void {
         return;
     }
     if (!isSameSizeAsTargetStateWire(.DiagonalUp, idx)) {
+        std.debug.print("NOT SAME SIZE AS TARGET\n", .{});
         return;
     }
 
@@ -680,7 +684,7 @@ pub fn loop() bool {
             null,
             null,
             rl.getMousePosition(),
-        )) {
+        ) or rl.isMouseButtonPressed(.left)) {
             won = false;
             return true;
         }
