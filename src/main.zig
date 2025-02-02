@@ -589,10 +589,17 @@ pub fn main() anyerror!void {
                 show_speedrun_timer = !show_speedrun_timer;
             }
 
-            if (show_speedrun_timer and game_start_time != 0) {
-                const delta = if (game_end_time != 0) (game_end_time - game_start_time) else (rl.getTime() - game_start_time);
+            if (show_speedrun_timer) {
+                var delta: f64 = undefined;
+                if (game_start_time == 0) {
+                    delta = 0;
+                } else if (game_end_time != 0) {
+                    delta = game_end_time - game_start_time;
+                } else {
+                    delta = rl.getTime() - game_start_time;
+                }
 
-                if (std.fmt.bufPrintZ(&timer_buffer, "{d:.2}", .{delta})) |out| {
+                if (std.fmt.bufPrintZ(&timer_buffer, "{d:.3}", .{delta})) |out| {
                     rl.drawTextEx(
                         fonts.main_font,
                         @ptrCast(out),
