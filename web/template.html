@@ -5,9 +5,14 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Biomechanics: The Puzzles of restoration</title>
     <style>
+      @font-face {
+        font-family: 'ark-pixel';
+        src:  url('ark-pixel-10.woff2') format('woff2');
+      }
       body {
         background-image: url(./website-bg.png);
         color: white;
+        font-family: "ark-pixel";
       }
       a {
         color: rgb(255, 192, 203) !important;
@@ -15,6 +20,21 @@
       span {
         text-align: center;
         display: block;
+      }
+      .fullscreen-btn {
+        width: 20px;
+      }
+      @media (pointer: none),(pointer:coarse) {
+          body::after {
+            background: url(./website-bg.png);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            content: "Not supported on mobile devices.";
+            font-size: 10vw;
+          }
       }
 
       #output {
@@ -46,6 +66,7 @@
         border: 0px none;
         background-color: black;
         height: 90vh;
+        outline: none;
       }
 
       .spinner {
@@ -110,7 +131,7 @@
     <hr />
     <figure style="overflow: visible" id="spinner">
       <div class="spinner"></div>
-      <center style="margin-top: 0.5em"><strong>emscripten</strong></center>
+      <center style="margin-top: 0.5em"><strong>BioMechanics</strong></center>
     </figure>
     <div class="emscripten" id="status">Downloading...</div>
     <div class="emscripten">
@@ -127,8 +148,11 @@
     <hr />
     <div class="emscripten">
       <input
-        type="button"
-        value="Fullscreen"
+        type="image"
+        src="fullscreen.png"
+        alt="fullscreen button"
+        title="Go Fullscreen"
+        class="fullscreen-btn"
         onclick="Module.requestFullscreen(false, false)"
       />
     </div>
