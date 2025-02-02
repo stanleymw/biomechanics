@@ -49,14 +49,19 @@ pub fn main() anyerror!void {
 
     var tut_anim_timer: f32 = 0;
     var tutorial_watched_at_least_once: bool = false;
+    var show_speedrun_timer: bool = false;
     var animFrames: i32 = 0;
     const tutorialAnim = try rl.loadImageAnim("resources/tutorial.gif", &animFrames);
     const tut_tex = try rl.loadTextureFromImage(tutorialAnim);
     var nextFrameDataOffset: usize = 0;
     var currentAnimFrame: i32 = 0;
 
+    var game_start_time: f64 = 0;
+    var game_end_time: f64 = 0;
+
     var currentScreen: types.Screen = .MainMenu;
     var current_text: *const []const u8 = &"";
+    var timer_buffer: [32:0]u8 = undefined;
 
     var mousePos = rl.Vector2.zero();
 
@@ -333,6 +338,8 @@ pub fn main() anyerror!void {
                         );
                         if (rl.isMouseButtonPressed(.left)) {
                             rl.unloadImage(tutorialAnim);
+
+                            game_start_time = rl.getTime();
                             currentScreen = .Globe;
                         }
                     }
@@ -355,7 +362,7 @@ pub fn main() anyerror!void {
                             &.{ info.name, " Repair" },
                             0,
                         ) catch |err| blk: {
-                            std.debug.print("err: {}", .{err});
+                            std.log.err("err: {}", .{err});
                             break :blk @as([*:0]const u8, @ptrCast(info.name));
                         },
                         anchor,
@@ -563,10 +570,12 @@ pub fn main() anyerror!void {
                             currentScreen = .Credits;
                         },
                     }
-
-                    //currentScreen = .Globe;
                 },
                 .Credits => {
+                    if (game_end_time == 0) {
+                        game_end_time = rl.getTime();
+                    }
+
                     const ending_music = assets.ending_music.getOrLoad();
                     rl.updateMusicStream(ending_music);
 
@@ -576,6 +585,28 @@ pub fn main() anyerror!void {
             }
 
             //rl.drawFPS(0, 0);
+            if (rl.isKeyPressed(.t)) {
+                show_speedrun_timer = !show_speedrun_timer;
+            }
+
+            if (show_speedrun_timer and game_start_time != 0) {
+                const delta = if (game_end_time != 0) (game_end_time - game_start_time) else (rl.getTime() - game_start_time);
+
+                if (std.fmt.bufPrintZ(&timer_buffer, "{d:.2}", .{delta})) |out| {
+                    rl.drawTextEx(
+                        fonts.main_font,
+                        @ptrCast(out),
+                        rl.Vector2.init(16, @floatFromInt(rl.getRenderHeight() - fonts.Size.Medium)),
+                        fonts.Size.Medium,
+                        0,
+                        rl.Color.green,
+                    );
+                } else |_| {
+                    // no more space left to print out the timer.
+                }
+            }
+
+            // end drawing
         }
     }
 }
