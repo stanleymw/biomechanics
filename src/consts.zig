@@ -1,8 +1,13 @@
+const rl = @import("raylib");
+
 pub const target_fps = 240;
 pub const tooltip_padding = 16.0;
 
 pub const screenWidth = 1080;
 pub const screenHeight = 1080;
+
+pub const selected_wire_color = rl.Color.green;
+pub const wire_thickness = 6.0;
 
 pub const credits =
     \\BioMechanics: The Puzzles of Restoration

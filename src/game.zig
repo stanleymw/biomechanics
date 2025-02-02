@@ -6,6 +6,7 @@ const types = @import("types.zig");
 const gui = @import("gui.zig");
 const utils = @import("utils.zig");
 const assets = @import("assets.zig");
+const consts = @import("consts.zig");
 
 const fonts = @import("fonts.zig");
 
@@ -443,54 +444,67 @@ fn indexToWorldPos(pos: u8) i32 {
     return pos * block_size + (block_size >> 1);
 }
 
+fn drawLineWithThickness(startPosX: i32, startPosY: i32, endPosX: i32, endPosY: i32, thickness: f32, color: rl.Color) void {
+    rl.drawLineEx(
+        rl.Vector2.init(@floatFromInt(startPosX), @floatFromInt(startPosY)),
+        rl.Vector2.init(@floatFromInt(endPosX), @floatFromInt(endPosY)),
+        thickness,
+        color,
+    );
+}
+
 fn renderWiresForDirectionWithSelectedIndex(direction: Direction, idx: usize, is_active: bool) void {
     const wires = directionToWires(direction);
     switch (direction) {
         .Vertical => {
             for (wires, 0..) |pos, loc| {
                 const coord = indexToWorldPos(pos);
-                rl.drawLine(
+                drawLineWithThickness(
                     coord,
                     0,
                     coord,
                     rl.getRenderHeight(),
-                    if (is_active and loc == idx) rl.Color.red else rl.Color.gray,
+                    consts.wire_thickness,
+                    if (is_active and loc == idx) consts.selected_wire_color else rl.Color.gray,
                 );
             }
         },
         .DiagonalUp => {
             for (wires, 0..) |pos, loc| {
                 const coord = indexToWorldPos(pos) + (block_size >> 1);
-                rl.drawLine(
+                drawLineWithThickness(
                     0,
                     coord,
                     coord,
                     0,
-                    if (is_active and loc == idx) rl.Color.red else rl.Color.gray,
+                    consts.wire_thickness,
+                    if (is_active and loc == idx) consts.selected_wire_color else rl.Color.gray,
                 );
             }
         },
         .Horizontal => {
             for (wires, 0..) |pos, loc| {
                 const coord = indexToWorldPos(pos);
-                rl.drawLine(
+                drawLineWithThickness(
                     0,
                     coord,
                     rl.getRenderWidth(),
                     coord,
-                    if (is_active and loc == idx) rl.Color.red else rl.Color.gray,
+                    consts.wire_thickness,
+                    if (is_active and loc == idx) consts.selected_wire_color else rl.Color.gray,
                 );
             }
         },
         .DiagonalDown => {
             for (wires, 0..) |pos, loc| {
                 const coord = indexToWorldPos(pos) + (block_size >> 1);
-                rl.drawLine(
+                drawLineWithThickness(
                     rl.getRenderWidth() - coord,
                     0,
                     rl.getRenderWidth(),
                     coord,
-                    if (is_active and loc == idx) rl.Color.red else rl.Color.gray,
+                    consts.wire_thickness,
+                    if (is_active and loc == idx) consts.selected_wire_color else rl.Color.gray,
                 );
             }
         },
