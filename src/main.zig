@@ -48,7 +48,7 @@ pub fn main() anyerror!void {
     const ending_speech = assets.endingSpeech.getOrLoad().sound;
 
     var tut_anim_timer: f32 = 0;
-    var tutorial_watched_at_least_once: bool = false;
+    var tutorial_watched_at_least_once: bool = true;
     var show_speedrun_timer: bool = false;
     var animFrames: i32 = 0;
     const tutorialAnim = try rl.loadImageAnim("resources/tutorial.gif", &animFrames);
@@ -485,8 +485,9 @@ pub fn main() anyerror!void {
                             //     rl.Color.white,
                             // );
                         }
-                        if (lev.solved)
+                        if (lev.solved) {
                             assets.checkmark.getOrLoad().drawEx(img_anchor, 0.0, 1.0, rl.Color.white);
+                        }
                         if (!lev.locked and !lev.solved and rl.checkCollisionPointRec(mousePos, bounds) and rl.isMouseButtonPressed(.left)) {
                             std.debug.print("request {s}... and setting loc={s}\n", .{ lev.name, location.getInfo().name });
 

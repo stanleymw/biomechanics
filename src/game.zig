@@ -17,6 +17,7 @@ var cursorState: Direction = .Vertical;
 
 var Level: types.LevelData = undefined;
 var level_loaded = false;
+var lastwon = false;
 
 pub fn levelUnloaded() bool {
     return !level_loaded;
@@ -640,6 +641,9 @@ pub fn loop() bool {
             }
         },
     }
+    if (rl.isKeyPressed(.down) or rl.isKeyPressed(.up) or rl.isKeyPressed(.right) or rl.isKeyPressed(.left)) {
+        lastwon = hasWon();
+    }
     renderWiresForDirectionWithSelectedIndex(.Vertical, selectedIndex, cursorState == .Vertical);
     renderWiresForDirectionWithSelectedIndex(.Horizontal, selectedIndex, cursorState == .Horizontal);
     renderWiresForDirectionWithSelectedIndex(.DiagonalUp, selectedIndex, cursorState == .DiagonalUp);
@@ -676,7 +680,7 @@ pub fn loop() bool {
         );
     }
 
-    if (rl.isKeyDown(.right_bracket) or hasWon()) {
+    if (rl.isKeyDown(.right_bracket) or lastwon) {
         if (!won) {
             won = true;
             assets.win_sfx.getOrLoad().play();
