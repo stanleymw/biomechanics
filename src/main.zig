@@ -48,7 +48,7 @@ pub fn main() anyerror!void {
     const ending_speech = assets.endingSpeech.getOrLoad().sound;
 
     var tut_anim_timer: f32 = 0;
-    var tutorial_watched_at_least_once: bool = true;
+    var tutorial_watched_at_least_once: bool = false;
     var show_speedrun_timer: bool = false;
     var animFrames: i32 = 0;
     const tutorialAnim = try rl.loadImageAnim("resources/tutorial.gif", &animFrames);
