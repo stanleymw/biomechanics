@@ -13,6 +13,10 @@ jobs:
         with:
           version: latest
       - run: zig build -Dtarget=x86_64-windows -Doptimize=ReleaseFast
+      - uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: libglx-dev libx11-dev
+          version: 1.0
       - run: zig build -Doptimize=ReleaseFast
       - uses: actions/upload-artifact@v4.6.0
         with:
