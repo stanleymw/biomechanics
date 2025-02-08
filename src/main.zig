@@ -357,7 +357,7 @@ pub fn main() anyerror!void {
                     rl.drawTextEx(
                         fonts.main_font,
                         std.mem.concatWithSentinel(
-                            std.heap.page_allocator,
+                            std.heap.c_allocator,
                             u8,
                             &.{ info.name, " Repair" },
                             0,
@@ -419,7 +419,7 @@ pub fn main() anyerror!void {
                     rl.drawTextEx(
                         fonts.main_font,
                         std.mem.concatWithSentinel(
-                            std.heap.page_allocator,
+                            std.heap.c_allocator,
                             u8,
                             &.{ location.getInfo().name, " Repair" },
                             0,
