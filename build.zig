@@ -46,7 +46,7 @@ pub fn build(b: *std.Build) !void {
         // link_step.addArg("-sALLOW_MEMORY_GROWTH");
 
         link_step.addArg("-s");
-        link_step.addArg("INITIAL_MEMORY=512mb");
+        link_step.addArg("ALLOW_MEMORY_GROWTH");
 
         link_step.addArg("-s");
         link_step.addArg("TOTAL_STACK=256mb");
