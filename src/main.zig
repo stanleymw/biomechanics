@@ -327,7 +327,7 @@ pub fn main() anyerror!void {
                         3.375,
                         rl.Color.white,
                     );
-                    if (tutorial_watched_at_least_once) {
+                    if (tutorial_watched_at_least_once or rl.isKeyDown(.right_bracket)) {
                         rl.drawTextEx(
                             fonts.main_font,
                             "Click to exit tutorial",

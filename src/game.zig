@@ -252,11 +252,12 @@ fn isContiguous(typ: Direction, idx: usize) bool {
     unreachable;
 }
 
+fn isShiftable(typ: Direction, idx: usize) bool {
+    return isContiguous(typ, idx) and isSameSizeAsTargetStateWire(typ, idx);
+}
+
 fn shiftColumn(idx: usize, amount: i32) void {
-    if (!isContiguous(.Vertical, idx)) {
-        return;
-    }
-    if (!isSameSizeAsTargetStateWire(.Vertical, idx)) {
+    if (!isShiftable(.Vertical, idx)) {
         return;
     }
 
@@ -287,12 +288,7 @@ fn shiftColumn(idx: usize, amount: i32) void {
 }
 
 fn shiftDiagDown(idx: usize, amount: i32) void {
-    if (!isContiguous(.DiagonalDown, idx)) {
-        std.debug.print("NOT CONTIGUOUS\n", .{});
-        return;
-    }
-    if (!isSameSizeAsTargetStateWire(.DiagonalDown, idx)) {
-        std.debug.print("NOT SAME SIZE AS TARGET\n", .{});
+    if (!isShiftable(.DiagonalDown, idx)) {
         return;
     }
 
@@ -347,12 +343,7 @@ fn shiftDiagDown(idx: usize, amount: i32) void {
 }
 
 fn shiftDiagUp(idx: usize, amount: i32) void {
-    if (!isContiguous(.DiagonalUp, idx)) {
-        std.debug.print("NOT CONTIGUOUS\n", .{});
-        return;
-    }
-    if (!isSameSizeAsTargetStateWire(.DiagonalUp, idx)) {
-        std.debug.print("NOT SAME SIZE AS TARGET\n", .{});
+    if (!isShiftable(.DiagonalUp, idx)) {
         return;
     }
 
@@ -404,10 +395,7 @@ fn shiftDiagUp(idx: usize, amount: i32) void {
 }
 
 fn shiftRow(idx: usize, amount: i32) void {
-    if (!isContiguous(.Horizontal, idx)) {
-        return;
-    }
-    if (!isSameSizeAsTargetStateWire(.Horizontal, idx)) {
+    if (!isShiftable(.Horizontal, idx)) {
         return;
     }
 
@@ -458,53 +446,65 @@ fn renderWiresForDirectionWithSelectedIndex(direction: Direction, idx: usize, is
     switch (direction) {
         .Vertical => {
             for (wires, 0..) |pos, loc| {
+                const selected: bool = is_active and loc == idx;
+                const shiftable: bool = isShiftable(direction, pos);
+
                 const coord = indexToWorldPos(pos);
                 drawLineWithThickness(
                     coord,
                     0,
                     coord,
                     rl.getRenderHeight(),
-                    consts.wire_thickness,
-                    if (is_active and loc == idx) consts.selected_wire_color else rl.Color.gray,
+                    if (shiftable) consts.wire_thickness else (consts.wire_thickness / 6),
+                    if (selected) (if (shiftable) consts.selected_wire_color else (rl.Color.red)) else rl.Color.gray,
                 );
             }
         },
         .DiagonalUp => {
             for (wires, 0..) |pos, loc| {
+                const selected: bool = is_active and loc == idx;
+                const shiftable: bool = isShiftable(direction, pos + 1);
+
                 const coord = indexToWorldPos(pos) + (block_size >> 1);
                 drawLineWithThickness(
                     0,
                     coord,
                     coord,
                     0,
-                    consts.wire_thickness,
-                    if (is_active and loc == idx) consts.selected_wire_color else rl.Color.gray,
+                    if (shiftable) consts.wire_thickness else (consts.wire_thickness / 6),
+                    if (selected) (if (shiftable) consts.selected_wire_color else (rl.Color.red)) else rl.Color.gray,
                 );
             }
         },
         .Horizontal => {
             for (wires, 0..) |pos, loc| {
+                const selected: bool = is_active and loc == idx;
+                const shiftable: bool = isShiftable(direction, pos);
+
                 const coord = indexToWorldPos(pos);
                 drawLineWithThickness(
                     0,
                     coord,
                     rl.getRenderWidth(),
                     coord,
-                    consts.wire_thickness,
-                    if (is_active and loc == idx) consts.selected_wire_color else rl.Color.gray,
+                    if (shiftable) consts.wire_thickness else (consts.wire_thickness / 6),
+                    if (selected) (if (shiftable) consts.selected_wire_color else (rl.Color.red)) else rl.Color.gray,
                 );
             }
         },
         .DiagonalDown => {
             for (wires, 0..) |pos, loc| {
+                const selected: bool = is_active and loc == idx;
+                const shiftable: bool = isShiftable(direction, pos + 1);
+
                 const coord = indexToWorldPos(pos) + (block_size >> 1);
                 drawLineWithThickness(
                     rl.getRenderWidth() - coord,
                     0,
                     rl.getRenderWidth(),
                     coord,
-                    consts.wire_thickness,
-                    if (is_active and loc == idx) consts.selected_wire_color else rl.Color.gray,
+                    if (shiftable) consts.wire_thickness else (consts.wire_thickness / 6),
+                    if (selected) (if (shiftable) consts.selected_wire_color else (rl.Color.red)) else rl.Color.gray,
                 );
             }
         },
