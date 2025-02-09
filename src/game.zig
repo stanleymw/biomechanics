@@ -18,17 +18,21 @@ const Direction = enum(u2) { Vertical, DiagonalUp, Horizontal, DiagonalDown };
 var cursorState: Direction = .Vertical;
 
 const MouseState = struct {
-    isHeld: bool = false,
-    startedHoldPos: rl.Vector2,
-    startedRow: usize,
-    startedCol: usize,
+    is_held: bool = false,
+    started_hold_pos: rl.Vector2,
+    started_row: usize,
+    started_col: usize,
+    current_shift_direction: Direction,
 };
 
 var mouse_state = MouseState{
-    .isHeld = false,
-    .startedHoldPos = rl.Vector2.init(0, 0),
-    .startedRow = 0,
-    .startedCol = 0,
+    .is_held = false,
+
+    .started_hold_pos = rl.Vector2.init(0, 0),
+    .started_row = 0,
+    .started_col = 0,
+
+    .current_shift_direction = .Vertical,
 };
 
 var Level: types.LevelData = undefined;
@@ -655,64 +659,34 @@ pub fn loop() bool {
     renderWiresForDirectionWithSelectedIndex(.DiagonalUp, selectedIndex, cursorState == .DiagonalUp);
     renderWiresForDirectionWithSelectedIndex(.DiagonalDown, selectedIndex, cursorState == .DiagonalDown);
 
-    const rendering_target: bool = rl.isKeyDown(.q);
-
-    // render pieces
-    for (if (rendering_target) Level.target_state else Level.state, 0..) |row, e| {
-        for (row, 0..) |pieceMaybe, z| {
-            if (pieceMaybe) |piece| {
-                const block_size_f: f32 = @floatFromInt(block_size);
-                gui.drawTextureCenteredAtPoint(
-                    2.0,
-                    0.0,
-                    rl.Vector2.init(
-                        @as(f32, @floatFromInt(z)) * block_size_f + block_size_f / 2,
-                        @as(f32, @floatFromInt(e)) * block_size_f + block_size_f / 2,
-                    ),
-                    markingToTexture(piece.marking),
-                );
-            }
-        }
-    }
-
-    if (rendering_target) {
-        rl.drawTextEx(
-            fonts.main_font,
-            "Target State",
-            rl.Vector2.init(10, 64),
-            fonts.Size.Large,
-            0,
-            rl.Color.white,
-        );
-    }
-
+    const current_mouse_pos = rl.getMousePosition();
     if (rl.isMouseButtonDown(.left)) {
-        const current_mouse_pos = rl.getMousePosition();
-        if (!mouse_state.isHeld) {
-            mouse_state.isHeld = true;
+        if (!mouse_state.is_held) {
+            mouse_state.is_held = true;
 
-            mouse_state.startedHoldPos = current_mouse_pos;
-            mouse_state.startedCol = worldPosToIndex(current_mouse_pos.x);
-            mouse_state.startedRow = worldPosToIndex(current_mouse_pos.y);
+            mouse_state.started_hold_pos = current_mouse_pos;
+            mouse_state.started_col = worldPosToIndex(current_mouse_pos.x);
+            mouse_state.started_row = worldPosToIndex(current_mouse_pos.y);
 
-            if (Level.state[mouse_state.startedCol][mouse_state.startedRow] == null) {
-                mouse_state.isHeld = false;
+            if (Level.state[mouse_state.started_row][mouse_state.started_col] == null) {
+                mouse_state.is_held = false;
             }
         }
-        if (mouse_state.isHeld) {
+        if (mouse_state.is_held) {
             // calculate how far it is from the start pos
-            rl.drawLineEx(mouse_state.startedHoldPos, current_mouse_pos, 2.0, rl.Color.green);
+            // rl.drawLineEx(mouse_state.started_hold_pos, current_mouse_pos, 2.0, rl.Color.green);
             const angle = std.math.atan2(
-                mouse_state.startedHoldPos.y - current_mouse_pos.y,
-                mouse_state.startedHoldPos.x - current_mouse_pos.x,
+                mouse_state.started_hold_pos.y - current_mouse_pos.y,
+                mouse_state.started_hold_pos.x - current_mouse_pos.x,
             );
 
-            const ir = worldPosToIndex(current_mouse_pos.x);
-            const ic = worldPosToIndex(current_mouse_pos.y);
+            // const ir = worldPosToIndex(current_mouse_pos.x);
+            // const ic = worldPosToIndex(current_mouse_pos.y);
 
-            rl.drawRectangle(ir * block_size, ic * block_size, block_size, block_size, rl.Color.green);
+            // rl.drawRectangle(ir * block_size, ic * block_size, block_size, block_size, rl.Color.green);
 
-            if (ir != mouse_state.startedRow or ic != mouse_state.startedCol) {
+            // if (ir != mouse_state.started_row or ic != mouse_state.started_col) {
+            if (true) {
                 var shiftUp: bool = undefined;
                 var shiftDir: Direction = undefined;
                 if (angle <= -pi + pi / 6.0) {
@@ -744,24 +718,100 @@ pub fn loop() bool {
                     shiftUp = true;
                 }
 
-                switch (shiftDir) {
-                    .Vertical => {
-                        // if (shiftColumn(ic + 1, if (shiftUp) -1 else 1)) {
-                        //     mouse_state.isHeld = false;
-                        // }
-                    },
-                    .DiagonalUp => {},
-                    .Horizontal => {},
-                    .DiagonalDown => {},
-                }
-
+                mouse_state.current_shift_direction = shiftDir;
                 // std.debug.print("{}: {}\n", .{ shiftDir, shiftUp });
             }
         }
     } else {
-        if (mouse_state.isHeld) {
-            mouse_state.isHeld = false;
+        if (mouse_state.is_held) {
+            mouse_state.is_held = false;
+
+            // const ir = worldPosToIndex(current_mouse_pos.x);
+            // const ic = worldPosToIndex(current_mouse_pos.y);
+            // calculate all the changes
+            switch (mouse_state.current_shift_direction) {
+                .Vertical => {
+                    const now: i32 = @intCast(worldPosToIndex(current_mouse_pos.y));
+                    const prev: i32 = @intCast(mouse_state.started_row);
+
+                    for (0..@intCast(@abs(prev - now))) |x| {
+                        _ = shiftColumn(mouse_state.started_col, if (prev > now) -1 else 1);
+                        std.debug.print("shift no: {}\n", .{x});
+                    }
+                    std.debug.print("delta: {}\n", .{prev - now});
+                },
+                .DiagonalUp => {},
+                .Horizontal => {
+                    const now: i32 = @intCast(worldPosToIndex(current_mouse_pos.x));
+                    const prev: i32 = @intCast(mouse_state.started_col);
+
+                    for (0..@intCast(@abs(prev - now))) |x| {
+                        _ = shiftRow(mouse_state.started_row, if (prev > now) -1 else 1);
+                        std.debug.print("shift no: {}\n", .{x});
+                    }
+                    std.debug.print("delta: {}\n", .{prev - now});
+                },
+                .DiagonalDown => {},
+            }
         }
+    }
+
+    const rendering_target: bool = rl.isKeyDown(.q);
+
+    // render pieces
+    for (if (rendering_target) Level.target_state else Level.state, 0..) |row, e| {
+        for (row, 0..) |pieceMaybe, z| {
+            if (pieceMaybe) |piece| {
+                const block_size_f: f32 = @floatFromInt(block_size);
+
+                var block_x: f32 = @as(f32, @floatFromInt(z)) * block_size_f + block_size_f / 2;
+                var block_y: f32 = @as(f32, @floatFromInt(e)) * block_size_f + block_size_f / 2;
+
+                if (mouse_state.is_held) {
+                    switch (mouse_state.current_shift_direction) {
+                        .Vertical => {
+                            if (z == mouse_state.started_col) {
+                                block_y += current_mouse_pos.y - mouse_state.started_hold_pos.y;
+                            }
+                        },
+                        .DiagonalUp => {
+                            // block_x += current_mouse_pos.x - mouse_state.started_hold_pos.x;
+                            // block_y += current_mouse_pos.y - mouse_state.started_hold_pos.y;
+                        },
+                        .Horizontal => {
+                            if (e == mouse_state.started_row) {
+                                block_x += current_mouse_pos.x - mouse_state.started_hold_pos.x;
+                            }
+                        },
+                        .DiagonalDown => {
+                            // block_x += current_mouse_pos.x - mouse_state.started_hold_pos.x;
+                            // block_y += current_mouse_pos.y - mouse_state.started_hold_pos.y;
+                        },
+                    }
+                }
+
+                gui.drawTextureCenteredAtPoint(
+                    2.0,
+                    0.0,
+                    rl.Vector2.init(
+                        block_x,
+                        block_y,
+                    ),
+                    markingToTexture(piece.marking),
+                );
+            }
+        }
+    }
+
+    if (rendering_target) {
+        rl.drawTextEx(
+            fonts.main_font,
+            "Target State",
+            rl.Vector2.init(10, 64),
+            fonts.Size.Large,
+            0,
+            rl.Color.white,
+        );
     }
 
     if (rl.isKeyDown(.right_bracket) or hasWon()) {
