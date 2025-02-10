@@ -228,16 +228,16 @@ fn isContiguous(typ: Direction, idx: usize) bool {
             var tracking = false;
             var left = false;
 
-            std.debug.print("START: xc={}, yc={} for idx={}\n", .{ xc, yc, idx });
+            // std.debug.print("START: xc={}, yc={} for idx={}\n", .{ xc, yc, idx });
             for (0..diag_len - 1) |_| {
                 if (Level.state[xc][yc]) |_| {
-                    std.debug.print("{} @ {},{}\n", .{ Level.state[xc][yc].?.marking, xc, yc });
+                    // std.debug.print("{} @ {},{}\n", .{ Level.state[xc][yc].?.marking, xc, yc });
                     tracking = true;
                     if (left) {
                         return false;
                     }
                 } else {
-                    std.debug.print("null @ {},{}\n", .{ xc, yc });
+                    // std.debug.print("null @ {},{}\n", .{ xc, yc });
                     if (tracking) {
                         left = true;
                     }
@@ -311,7 +311,7 @@ fn shiftDiagDown(idx: usize, amount: i32) void {
 
         var firsty = true;
         for (0..diag_len - 1) |_| {
-            std.debug.print("SHIFT DIAGDOWN UP: {} {} for IDX={}\n", .{ xc, yc, idx });
+            // std.debug.print("SHIFT DIAGDOWN UP: {} {} for IDX={}\n", .{ xc, yc, idx });
             if (firsty and Level.state[xc][yc] != null) {
                 return;
             } else {
@@ -326,7 +326,7 @@ fn shiftDiagDown(idx: usize, amount: i32) void {
     } else {
         var firsty = true;
         for (0..diag_len - 1) |_| {
-            std.debug.print("SHIFT DIAGDOWn DOWN: {} {} for IDX={}\n", .{ xc, yc, idx });
+            // std.debug.print("SHIFT DIAGDOWn DOWN: {} {} for IDX={}\n", .{ xc, yc, idx });
             if (firsty and Level.state[xc][yc] != null) {
                 return;
             } else {
@@ -378,7 +378,7 @@ fn shiftDiagUp(idx: usize, amount: i32) void {
     } else {
         var firsty = true;
         for (0..diag_len - 1) |_| {
-            std.debug.print("SHIFT DIAGUP DOWN: {} {} for IDX={}\n", .{ xc, yc, idx });
+            // std.debug.print("SHIFT DIAGUP DOWN: {} {} for IDX={}\n", .{ xc, yc, idx });
             if (firsty and Level.state[xc][yc] != null) {
                 return;
             } else {
