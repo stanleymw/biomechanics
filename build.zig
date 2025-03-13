@@ -1,11 +1,11 @@
 const std = @import("std");
-const rlz = @import("raylib_zig");
+const rlz = @import("raylib-zig");
 
 pub fn build(b: *std.Build) !void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
 
-    const raylib_dep = b.dependency("raylib_zig", .{
+    const raylib_dep = b.dependency("raylib-zig", .{
         .target = target,
         .optimize = optimize,
     });

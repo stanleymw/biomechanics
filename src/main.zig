@@ -13,11 +13,8 @@ const consts = @import("consts.zig");
 const assets = @import("assets.zig");
 
 pub fn main() anyerror!void {
-    rl.setConfigFlags(.{ .window_highdpi = true });
     rl.initWindow(consts.screenWidth, consts.screenHeight, "BioMechanics: The Puzzles of Restoration");
     defer rl.closeWindow(); // Close window and OpenGL context
-
-    rl.setMouseScale(1, 1);
 
     rl.initAudioDevice();
     defer rl.closeAudioDevice();
@@ -66,8 +63,6 @@ pub fn main() anyerror!void {
     var current_text: *const []const u8 = &"";
     var timer_buffer: [32:0]u8 = undefined;
 
-    var credits_pos: f64 = 1024.0;
-
     var mousePos = rl.Vector2.zero();
 
     const info_anchor = rl.Vector2.init(190, 200);
@@ -102,8 +97,6 @@ pub fn main() anyerror!void {
             rl.clearBackground(rl.Color.black);
             mousePos = rl.getMousePosition();
 
-            // std.debug.print("{d} {d} \n", .{ mousePos.x, mousePos.y });
-
             switch (currentScreen) {
                 .MainMenu => {
                     rl.updateMusicStream(main_music);
@@ -131,7 +124,7 @@ pub fn main() anyerror!void {
                                 location = poi.location;
                             },
                             .Hovered => {
-                                const dat: [:0]const u8 = @ptrCast(poi.location.getInfo().name);
+                                const dat: [*:0]const u8 = @ptrCast(poi.location.getInfo().name);
                                 const bounds = rl.measureTextEx(fonts.main_font, dat, fonts.Size.Small, 0);
                                 rl.drawRectangleRec(
                                     rl.Rectangle.init(
@@ -338,7 +331,7 @@ pub fn main() anyerror!void {
                         rl.drawTextEx(
                             fonts.main_font,
                             "Click to exit tutorial",
-                            rl.Vector2.init(10, @floatFromInt(rl.getScreenHeight() - 64)),
+                            rl.Vector2.init(10, @floatFromInt(rl.getRenderHeight() - 64)),
                             fonts.Size.Medium,
                             0,
                             rl.Color.white,
@@ -370,7 +363,7 @@ pub fn main() anyerror!void {
                             0,
                         ) catch |err| blk: {
                             std.log.err("err: {}", .{err});
-                            break :blk @as([:0]const u8, @ptrCast(info.name));
+                            break :blk @as([*:0]const u8, @ptrCast(info.name));
                         },
                         anchor,
                         fonts.Size.Medium,
@@ -432,7 +425,7 @@ pub fn main() anyerror!void {
                             0,
                         ) catch |err| blk: {
                             std.debug.print("err: {}", .{err});
-                            break :blk @as([:0]const u8, @ptrCast(location.getInfo().name));
+                            break :blk @as([*:0]const u8, @ptrCast(location.getInfo().name));
                         },
                         main_anchor,
                         fonts.Size.Medium,
@@ -581,14 +574,13 @@ pub fn main() anyerror!void {
                 .Credits => {
                     if (game_end_time == 0) {
                         game_end_time = rl.getTime();
-                    } else {
-                        credits_pos += -50 * rl.getFrameTime();
                     }
 
                     const ending_music = assets.ending_music.getOrLoad();
                     rl.updateMusicStream(ending_music);
 
-                    rl.drawTextEx(fonts.main_font, consts.credits, rl.Vector2.init(16, @floatCast(credits_pos)), fonts.Size.Large, 0, rl.Color.white);
+                    const delta = rl.getTime() - startTime.?;
+                    rl.drawTextEx(fonts.main_font, consts.credits, rl.Vector2.init(16, @floatCast((delta * -50) + 1024.0)), fonts.Size.Large, 0, rl.Color.white);
                 },
             }
 
@@ -611,7 +603,7 @@ pub fn main() anyerror!void {
                     rl.drawTextEx(
                         fonts.main_font,
                         @ptrCast(out),
-                        rl.Vector2.init(16, @floatFromInt(rl.getScreenHeight() - fonts.Size.Medium)),
+                        rl.Vector2.init(16, @floatFromInt(rl.getRenderHeight() - fonts.Size.Medium)),
                         fonts.Size.Medium,
                         0,
                         rl.Color.green,

@@ -26,7 +26,7 @@ pub const SoundWrapper = struct {
     pub fn isPlaying(self: SoundWrapper) bool {
         return rl.isSoundPlaying(self.sound);
     }
-    pub fn loadFrom(fp: [:0]const u8) SoundWrapper {
+    pub fn loadFrom(fp: [*:0]const u8) SoundWrapper {
         return .{ .sound = unwrap.unwrap(rl.Sound, rl.loadSound(fp)) };
     }
     pub fn deinit(self: SoundWrapper) void {
@@ -38,9 +38,9 @@ pub const SoundWrapper = struct {
 pub fn Asset(comptime T: type) type {
     return struct {
         asset: ?T = null,
-        file_path: [:0]const u8,
+        file_path: [*:0]const u8,
 
-        pub fn init(comptime fp: [:0]const u8) Asset(T) {
+        pub fn init(comptime fp: [*:0]const u8) Asset(T) {
             return .{ .file_path = fp };
         }
 
